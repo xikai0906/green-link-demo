@@ -488,7 +488,7 @@ with tab3:
             import qrcode
             from io import BytesIO
             
-            qr_url = "https://xikai0906.github.io/green-link-demo/"
+            qr_url = "https://github.com/xikai0906/green-link-demo/"
             
             qr = qrcode.QRCode(
                 version=1,
