@@ -222,4 +222,4 @@ MIT License
 
 ---
 
-© 2024 GreenLink | 创新创业大赛DEMO
+© 2026 GreenLink | 创新创业大赛DEMO
