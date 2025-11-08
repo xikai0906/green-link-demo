@@ -507,8 +507,7 @@ with tab3:
             
             st.image(buf, caption="扫描查看产品溯源", width=250)
             
-            st.caption(f"🔗 链接: {qr_url}")
-            st.caption("请将上述网址替换为您的实际GitHub Pages地址")
+            st.caption(f"🔗 链接: {https://github.com/l}")
             
         except ImportError:
             st.warning("需要安装 qrcode 库: `pip install qrcode`")
