@@ -507,7 +507,7 @@ with tab3:
             
             st.image(buf, caption="扫描查看产品溯源", width=250)
             
-           st.caption(f"🔗 链接: {qr_url}")
+            st.caption(f"🔗 链接: {qr_url}")
             
         except ImportError:
             st.warning("需要安装 qrcode 库: `pip install qrcode`")
