@@ -1,0 +1,195 @@
+{
+  "company": "FGV Holdings Berhad",
+  "company_info": {
+    "full_name": "FGV Holdings Berhad",
+    "country": "Malaysia",
+    "industry": "Palm Oil Production",
+    "founded": "2007",
+    "employees": "~18,000",
+    "description": "马来西亚最大的棕榈油生产商之一"
+  },
+  "environment": {
+    "risk_level": "低风险",
+    "risk_score": 25,
+    "status": "✅",
+    "analysis": {
+      "method": "Sentinel-2 卫星影像分析",
+      "period": "2018-2023",
+      "indicator": "森林覆盖变化率",
+      "result": "未检测到大规模毁林活动",
+      "evidence": {
+        "satellite_image_before": "assets/satellite_images/FGV_2014.png",
+        "satellite_image_after": "assets/satellite_images/FGV_2022.png",
+        "ndvi_change": -2.3,
+        "conclusion": "种植园边界稳定，无新增毁林证据。基于Sentinel-2多光谱卫星数据分析，5年间植被指数变化在正常范围内。"
+      },
+      "data_source": {
+        "primary": "欧盟Sentinel-2卫星数据",
+        "frequency": "每5天更新",
+        "resolution": "10米空间分辨率",
+        "coverage": "全球覆盖"
+      }
+    },
+    "compliance": {
+      "eudr": "✅ 符合欧盟EUDR法规（无毁林证据）",
+      "rspo": "⚠️ RSPO认证部分暂停（因社会问题）",
+      "iscc": "✅ ISCC EU认证有效"
+    },
+    "metrics": {
+      "deforestation_rate": "0.1%",
+      "protected_area": "15%",
+      "reforestation": "200公顷/年"
+    }
+  },
+  "social": {
+    "risk_level": "高风险",
+    "risk_score": 75,
+    "status": "⚠️",
+    "key_events": [
+      {
+        "date": "2020-09-30",
+        "event": "美国海关和边境保护局(CBP)对FGV发布暂扣令(WRO)，基于强迫劳动的指控",
+        "source": "U.S. Customs and Border Protection (CBP)",
+        "impact": "在所有美国入境口岸扣留FGV的棕榈油及其产品，禁止进入美国市场。这导致FGV年出口损失约2亿美元，对公司财务和国际声誉造成重大打击。",
+        "url": "https://www.cbp.gov/newsroom/national-media-release/cbp-issues-detention-order-palm-oil-produced-forced-labor-malaysia",
+        "severity": "严重"
+      },
+      {
+        "date": "2024-02-22",
+        "event": "FGV设定目标在2024年底前解除美国进口禁令，已投入超1亿林吉特补偿工人招聘费",
+        "source": "The Edge Malaysia",
+        "impact": "显示公司积极整改，计划在2024年6月提交请愿书。但禁令仍未解除，出口限制持续影响公司业绩和供应链伙伴的风险评估。",
+        "url": "https://theedgemalaysia.com/node/700737",
+        "severity": "中等（正面进展但问题未解决）"
+      },
+      {
+        "date": "2024-07-05",
+        "event": "FGV正式向美国CBP提交修改WRO（暂扣令）的请愿书",
+        "source": "FGV Holdings Berhad (官方)",
+        "impact": "FGV于2024年6月30日提交请愿书，展示整改决心。但CBP审核周期通常需6-12个月，短期内风险仍然存在，下游企业需持续关注进展。",
+        "url": "https://www.fgvholdings.com/press_release/fgv-submits-petition-to-us-cbp-to-modify-wro/",
+        "severity": "低（积极进展）"
+      }
+    ],
+    "traditional_rating": {
+      "msci": "BB",
+      "sustainalytics": "35.2 (高风险)",
+      "description": "传统评级模糊，BB级别无法明确区分是环境还是社会问题，且更新周期长达半年"
+    },
+    "root_causes": [
+      "外籍劳工管理不善",
+      "供应链透明度不足",
+      "监督机制薄弱",
+      "历史遗留问题"
+    ],
+    "metrics": {
+      "foreign_workers": "约70%劳工为外籍",
+      "labor_complaints": "2018-2020年超过200起投诉",
+      "improvement_investment": "超1亿林吉特（2024年投入）"
+    }
+  },
+  "supply_chain": {
+    "upstream": {
+      "name": "FGV Holdings Berhad",
+      "role": "棕榈油原料供应商",
+      "location": "马来西亚（彭亨州、柔佛州等）",
+      "plantations": "约35.5万公顷种植园",
+      "risk_alert": true,
+      "production_capacity": "年产约450万吨棕榈油"
+    },
+    "midstream": {
+      "name": "中粮集团",
+      "role": "食品加工与品牌商",
+      "location": "中国",
+      "products": [
+        "福临门食用油",
+        "金龙鱼调和油",
+        "其他食品加工产品"
+      ],
+      "exposure": "FGV占中粮棕榈油采购的约18%（估算）",
+      "annual_procurement": "约80万吨棕榈油（总量）",
+      "dependency": "中等依赖度，但FGV是重要供应商之一"
+    },
+    "downstream": {
+      "markets": [
+        "欧盟",
+        "美国",
+        "中国",
+        "东南亚"
+      ],
+      "regulations": {
+        "eu": "欧盟EUDR法规（2024年12月生效）要求零毁林证明和尽职调查，违规企业面临高达年营业额4%的罚款",
+        "us": "美国CBP已对FGV发布进口禁令，禁止任何含FGV产品的货物入境，违规将被扣押和罚款。FGV已于2024年6月提交修改WRO的请愿书，但审核周期需6-12个月",
+        "china": "中国消费者日益关注可持续性，绿色认证产品溢价约5-10%，品牌声誉风险上升"
+      },
+      "market_impact": {
+        "eu": "高风险 - EUDR法规执行严格",
+        "us": "极高风险 - 当前仍被禁止进口（虽有整改但未解除）",
+        "china": "中等风险 - 消费者意识提升"
+      }
+    },
+    "impact_alert": {
+      "severity": "高",
+      "message": "⚠️ 紧急风险警报！您的供应商FGV的高风险S指标已触发美国CBP进口禁令（2020年至今）。虽然FGV已于2024年6月提交修改请愿书并投入超1亿林吉特整改，但禁令仍未解除，这意味着：\n\n1. 任何含有FGV棕榈油的产品仍无法进入美国市场\n2. 欧盟EUDR法规将对供应链透明度进行严格审查\n3. 国际品牌客户可能因声誉风险要求更换供应商\n4. CBP审核周期需6-12个月，短期风险持续存在\n\n建议立即启动供应商ESG审计，评估替代方案，并持续监控FGV的整改进展。"
+    },
+    "risk_scenarios": [
+      {
+        "scenario": "最坏情况",
+        "probability": "20%",
+        "impact": "FGV请愿失败，禁令长期存在。美国市场完全关闭，欧盟客户暂停采购，年损失可达5000万美元",
+        "mitigation": "立即启动供应商多元化，6个月内降低FGV依赖至5%以下"
+      },
+      {
+        "scenario": "中等情况（最可能）",
+        "probability": "60%",
+        "impact": "FGV在2025年上半年解除禁令，但需持续监督。增加合规成本约200万美元/年",
+        "mitigation": "获取绿链认证，向客户证明供应链透明度和ESG合规，同时准备替代供应商"
+      },
+      {
+        "scenario": "最好情况",
+        "probability": "20%",
+        "impact": "FGV于2024年底前解除CBP禁令并完成全面整改",
+        "mitigation": "保持警惕，建立持续ESG监控机制，确保问题不再复发"
+      }
+    ]
+  },
+  "greenlink_advantage": {
+    "vs_traditional_rating": {
+      "traditional": {
+        "rating": "MSCI BB级",
+        "problem": "模糊不清，无法区分E和S风险",
+        "update_frequency": "年度更新（滞后6个月）",
+        "cost": "订阅费高昂（年费数万美元）",
+        "recent_case": "2024年7月FGV提交请愿书，但传统评级尚未更新反映这一进展"
+      },
+      "greenlink": {
+        "e_rating": "低风险（25/100）",
+        "s_rating": "高风险（75/100）",
+        "precision": "精准定位：社会问题才是核心风险，环境表现实际良好",
+        "update_frequency": "周度更新（实时追踪新闻和公告）",
+        "cost": "基于免费数据，成本低90%",
+        "recent_case": "2024年7月FGV请愿书提交后，绿链系统已同步更新风险评估"
+      }
+    },
+    "data_sources": {
+      "environment": "Sentinel-2卫星数据（免费）",
+      "social": "CBP官网、公司公告、主流媒体（免费）",
+      "technology": "Python自动化分析"
+    },
+    "key_insights": [
+      "FGV的环境表现实际良好（卫星验证无毁林），传统评级混淆了E和S风险",
+      "真正的风险来自社会层面（劳工问题），这需要舆情监控而非卫星数据",
+      "E/S分离评分使企业能够精准应对，而非盲目投入",
+      "实时追踪：FGV已在2024年积极整改，但短期风险仍存，需持续监控"
+    ]
+  },
+  "metadata": {
+    "report_version": "2.0",
+    "last_updated": "2024-11-07",
+    "data_sources_count": 3,
+    "latest_event": "2024-07-05 FGV提交修改WRO请愿书",
+    "analysis_method": "Alternative Data + AI",
+    "confidence_level": "高",
+    "next_review": "2024-12-07"
+  }
+}
