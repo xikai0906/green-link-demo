@@ -212,9 +212,9 @@ JSON 数据结构：
 
 ## 📞 联系方式
 
-- 项目作者: [Your Name]
-- 邮箱: [your.email@example.com]
-- GitHub: [github.com/yourusername]
+- 项目作者:RILEY.SKYE.CHOU
+- 邮箱:ysuy5756@gmail.com
+- GitHub: [https://github.com/xikai0906]
 
 ## 📄 许可证
 
