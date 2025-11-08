@@ -99,6 +99,49 @@
             color: #7f8c8d;
             font-size: 12px;
         }
+
+        /* --- 这是新加入的样式 --- */
+
+        /* 1. 让卫星图片适应手机屏幕 */
+        .satellite-img {
+            width: 100%;
+            border-radius: 12px;
+            margin-top: 10px;
+        }
+        
+        /* 2. 时间线样式 */
+        .timeline {
+            position: relative;
+            padding-left: 25px; /* 为时间线留出空间 */
+            border-left: 2px solid #27ae60; /* 时间线的竖线 */
+        }
+        .timeline-item {
+            position: relative;
+            margin-bottom: 20px;
+        }
+        /* 最后一个时间项去掉底部外边距 */
+        .timeline-item:last-child {
+            margin-bottom: 0;
+        }
+        .timeline-item::before {
+            content: '✅'; /* 时间线上的标记点 */
+            position: absolute;
+            left: -30px; /* 移到竖线左侧 */
+            top: 0;
+            background: white;
+            padding-left: 4px; /* 修正对齐 */
+            font-size: 20px;
+        }
+        .timeline-date {
+            font-weight: bold;
+            color: #34495e;
+            font-size: 14px;
+        }
+        .timeline-desc {
+            font-size: 14px;
+            color: #7f8c8d;
+        }
+
     </style>
 </head>
 <body>
@@ -121,7 +164,16 @@
                 <span class="badge">✅ 无非法毁林</span>
                 <span class="badge">✅ 符合欧盟EUDR法规</span>
             </div>
-        </div>
+
+            <div class="info-item">
+                <div class="info-label">卫星影像对比 (2014 vs 2022)</div>
+                <img src="FGV_2014.png" alt="2014年卫星图" class="satellite-img">
+                <img src="FGV_2022.png" alt="2022年卫星图" class="satellite-img">
+                <p style="text-align: center; font-size: 12px; color: #7f8c8d; margin-top: 5px;">
+                    基于Sentinel-2卫星验证，种植园边界稳定，无非法毁林。
+                </p>
+            </div>
+            </div>
         
         <div class="section">
             <h2>🏭 加工工厂</h2>
@@ -145,7 +197,28 @@
                 ✅ 零毁林承诺验证
             </div>
         </div>
-        
+
+        <div class="section">
+            <h2>🌿 绿色里程碑</h2>
+            <div class="timeline">
+                
+                <div class="timeline-item">
+                    <div class="timeline-date">2014-2022年</div>
+                    <div class="timeline-desc">Sentinel-2 卫星持续监测，无毁林证据。</div>
+                </div>
+
+                <div class="timeline-item">
+                    <div class="timeline-date">2023年 第4季度</div>
+                    <div class="timeline-desc">通过 ISO 22000 & HACCP 质量认证。</div>
+                </div>
+
+                <div class="timeline-item">
+                    <div class="timeline-date">2024年 第2季度</div>
+                    <div class="timeline-desc">通过“绿链”ESG风险评估，评级：低环境风险。</div>
+                </div>
+
+            </div>
+        </div>
         <div class="thank-you">
             <h2>❤️ 感谢您的选择</h2>
             <p>每一次购买绿链认证产品，都是对可持续发展的支持！</p>
