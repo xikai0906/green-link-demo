@@ -488,7 +488,7 @@ with tab3:
             import qrcode
             from io import BytesIO
             
-            qr_url = "https://your-username.github.io/greenlink-demo/"
+            qr_url = "https://xikai0906.github.io/green-link-demo/"
             
             qr = qrcode.QRCode(
                 version=1,
@@ -507,7 +507,7 @@ with tab3:
             
             st.image(buf, caption="扫描查看产品溯源", width=250)
             
-            st.caption(f"🔗 链接: {https://github.com/l}")
+           st.caption(f"🔗 链接: {qr_url}")
             
         except ImportError:
             st.warning("需要安装 qrcode 库: `pip install qrcode`")
