@@ -59,7 +59,7 @@ st.markdown("""
 """, unsafe_allow_html=True)
 
 # 标题
-st.markdown('<p class="main-header;style="font-size: 155px;">🌿 绿链 GreenLink</p>', unsafe_allow_html=True)
+st.markdown('<p class="main-header">🌿 绿链 GreenLink</p>', unsafe_allow_html=True)
 st.markdown('<p class="sub-header">基于另类数据的供应链ESG风险评估平台</p>', unsafe_allow_html=True)
 
 # 侧边栏：选择公司
