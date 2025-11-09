@@ -1,0 +1,212 @@
+{
+  "company": "中粮集团 (COFCO Corporation)",
+  "industry": "农产品加工与贸易",
+  "headquarters": "中国北京",
+  "description": "中国最大的农产品加工企业，全球领先的粮油食品企业",
+  
+  "traditional_rating": {
+    "agency": "MSCI ESG Rating",
+    "rating": "BBB",
+    "limitation": "综合评级无法精准识别供应链传导风险"
+  },
+  
+  "environment": {
+    "risk_level": "低风险",
+    "risk_score": 30,
+    "analysis": {
+      "method": "企业环境报告审查 + 生产设施监测",
+      "period": "2020-2024",
+      "key_findings": [
+        "已建立ISO 14001环境管理体系",
+        "承诺2030年实现碳达峰",
+        "中游加工环节环境影响相对可控"
+      ],
+      "conclusion": "中粮作为中游加工商，自身生产环节环境表现良好，但需关注上游原料采购的环境合规性"
+    },
+    "positive_actions": [
+      "2022年发布《可持续发展报告》",
+      "建立绿色供应链管理体系",
+      "投资可再生能源项目"
+    ]
+  },
+  
+  "social": {
+    "risk_level": "中风险",
+    "risk_score": 45,
+    "analysis": {
+      "method": "供应链尽职调查 + 公开舆情监测",
+      "risk_source": "上游供应商风险传导",
+      "key_concern": "马来西亚棕榈油供应商FGV的劳工问题可能影响中粮的合规性"
+    },
+    "key_events": [
+      {
+        "date": "2020-09",
+        "event": "美国CBP将FGV列入强迫劳动进口禁令清单",
+        "impact": "作为FGV下游客户，中粮面临供应链合规审查压力",
+        "severity": "高"
+      },
+      {
+        "date": "2021-06",
+        "event": "欧盟提出《尽职调查法案》草案",
+        "impact": "要求企业对供应链人权和环境风险承担责任",
+        "severity": "中"
+      },
+      {
+        "date": "2023-06",
+        "event": "欧盟《森林砍伐法规》(EUDR)正式生效",
+        "impact": "需证明棕榈油原料无毁林风险，2024年12月30日前完成合规",
+        "severity": "高"
+      },
+      {
+        "date": "2024-07",
+        "event": "FGV向美国CBP提交整改请愿书",
+        "impact": "若整改成功，将降低中粮的供应链风险；仍需持续监控",
+        "severity": "中"
+      }
+    ],
+    "risk_mitigation": [
+      "正在建立供应商ESG评估体系",
+      "增加棕榈油供应商多元化",
+      "与FGV保持沟通并监督整改进展"
+    ]
+  },
+  
+  "governance": {
+    "risk_level": "低风险",
+    "risk_score": 25,
+    "highlights": [
+      "国有企业，治理结构规范",
+      "已建立ESG管理委员会",
+      "定期披露可持续发展信息"
+    ]
+  },
+  
+  "supply_chain": {
+    "position": "中游加工商",
+    "upstream": {
+      "suppliers": [
+        {
+          "name": "FGV Holdings Berhad",
+          "country": "马来西亚",
+          "product": "棕榈油原料",
+          "risk_status": "高社会风险（75分）",
+          "note": "美国CBP禁令影响，正在整改中"
+        },
+        {
+          "name": "IOI集团",
+          "country": "马来西亚",
+          "product": "棕榈油原料",
+          "risk_status": "低风险（备选供应商）"
+        },
+        {
+          "name": "国内油料作物种植基地",
+          "country": "中国",
+          "product": "大豆、油菜籽",
+          "risk_status": "低风险"
+        }
+      ],
+      "risk_transmission_path": [
+        "FGV劳工问题 → 美国市场禁令 → 中粮采购合规风险",
+        "FGV潜在毁林风险 → 欧盟EUDR要求 → 中粮出口受限"
+      ]
+    },
+    "downstream": {
+      "markets": [
+        {
+          "region": "欧盟",
+          "products": ["食用油", "饲料原料"],
+          "regulation": "EUDR（森林砍伐法规）",
+          "compliance_deadline": "2024-12-30",
+          "risk": "若上游FGV未通过审查，出口可能受阻"
+        },
+        {
+          "region": "美国",
+          "products": ["食品原料"],
+          "regulation": "CBP强迫劳动禁令",
+          "risk": "需证明原料非来自FGV禁令期间的产品"
+        },
+        {
+          "region": "中国国内",
+          "products": ["福临门食用油", "金龙鱼竞品"],
+          "regulation": "相对宽松，但消费者ESG意识提升",
+          "risk": "品牌声誉风险"
+        }
+      ],
+      "impact_analysis": "若FGV问题持续，中粮可能面临：1) 欧美市场出口受限；2) 替换供应商成本上升；3) 品牌形象受损"
+    },
+    "mitigation_strategy": {
+      "short_term": [
+        "增加IOI等低风险供应商采购比例",
+        "建立供应商ESG评分卡系统",
+        "准备EUDR合规文件和追溯证明"
+      ],
+      "long_term": [
+        "投资国内油料作物种植基地",
+        "开发区块链溯源系统",
+        "参与行业可持续标准制定（如RSPO认证）"
+      ]
+    }
+  },
+  
+  "regulatory_compliance": {
+    "EUDR": {
+      "status": "进行中",
+      "deadline": "2024-12-30",
+      "requirements": [
+        "证明棕榈油原料无毁林风险",
+        "提供地理位置数据和卫星影像证明",
+        "建立尽职调查系统"
+      ],
+      "progress": "已启动供应商审计，正在收集卫星数据"
+    },
+    "US_CBP": {
+      "status": "监控中",
+      "risk": "若继续采购FGV产品，可能面临美国市场准入问题",
+      "action": "暂停从FGV直接采购，等待其整改结果"
+    }
+  },
+  
+  "greenlink_advantage": {
+    "vs_traditional_rating": [
+      "传统评级：MSCI给BBB，看不出供应链风险",
+      "绿链评分：社会风险45分，精准识别来自FGV的传导风险"
+    ],
+    "real_time_monitoring": [
+      "2024年7月FGV提交整改请愿书 → 绿链系统实时更新",
+      "传统评级年度更新，反应滞后"
+    ],
+    "actionable_insights": [
+      "明确告知：需多元化供应商，降低对FGV依赖",
+      "提供合规报告模板，助力EUDR申报"
+    ]
+  },
+  
+  "recommendations": {
+    "immediate": [
+      "完成对FGV的现场审计",
+      "准备EUDR合规文件包",
+      "与欧美客户沟通供应链整改进展"
+    ],
+    "medium_term": [
+      "将FGV采购比例从当前30%降至10%以下",
+      "增加IOI等RSPO认证供应商",
+      "建立供应链透明度平台"
+    ],
+    "long_term": [
+      "投资建设国内油料基地，实现原料自主可控",
+      "开发区块链+卫星遥感的智能溯源系统",
+      "成为行业可持续供应链标杆"
+    ]
+  },
+  
+  "data_sources": [
+    "中粮集团官方可持续发展报告",
+    "美国CBP进口禁令清单",
+    "欧盟EUDR法规文件",
+    "公开新闻报道（路透社、彭博社）",
+    "供应链公开信息"
+  ],
+  
+  "last_updated": "2024-11-09",
+  "greenlink_assessment_id": "COFCO-2024-11"
+}
