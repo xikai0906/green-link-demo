@@ -1001,10 +1001,6 @@
                 }
             }
         });
-
-        // ========== 修复 2：添加此代码块 ==========
-        // (此代码块必须在所有 Chart.js 代码之后，但在 </script> 之前)
-        
         // 辅助函数，用于将数字补零 (例如 9 -> "09")
         function pad(num) {
             return num.toString().padStart(2, '0');
@@ -1027,7 +1023,6 @@
         if (timeElement) {
             timeElement.textContent = formattedTime;
         }
-        // ========== 修复 2 结束 ==========
     </script>
 </body>
 </html>
