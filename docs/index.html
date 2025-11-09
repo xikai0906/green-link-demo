@@ -750,7 +750,7 @@
                 <a href="mailto:support@greenlink.example.com">联系我们</a>
             </p>
             <p style="margin-top: 15px; font-size: 11px; color: #95a5a6;">
-                溯源编号: FL-2024110901 | 查询时间: 2024-11-09 14:30<br>
+                溯源编号: FL-2024110901 | 查询时间: <span id="current-time-value">...</span><br>
                 本溯源信息由绿链平台实时生成
             </p>
         </div>
@@ -785,7 +785,6 @@
             const modalImg = document.getElementById('modalImage');
             const caption = document.getElementById('modalCaption');
             
-            // ========== 修复：移除了所有 'assets/satellite_images/' 路径 ==========
             const imageData = {
                 'ioi2012': {
                     src: 'IOI_2012.png',
@@ -830,7 +829,7 @@
         
         const chartConfig = {
             responsive: true,
-            maintainAspectRatio: false, /* <--- 修复：改为 false 以适应手机屏幕 */
+            maintainAspectRatio: false, /* 修复：改为 false 以适应手机屏幕 */
             plugins: {
                 legend: {
                     display: true,
@@ -1002,6 +1001,33 @@
                 }
             }
         });
+
+        // ========== 修复 2：添加此代码块 ==========
+        // (此代码块必须在所有 Chart.js 代码之后，但在 </script> 之前)
+        
+        // 辅助函数，用于将数字补零 (例如 9 -> "09")
+        function pad(num) {
+            return num.toString().padStart(2, '0');
+        }
+
+        // 获取当前时间
+        const now = new Date();
+        const year = now.getFullYear();
+        const month = pad(now.getMonth() + 1); // JS 的月份是从 0 开始的
+        const day = pad(now.getDate());
+        const hours = pad(now.getHours());
+        const minutes = pad(now.getMinutes());
+        const seconds = pad(now.getSeconds());
+        
+        // 格式化时间字符串
+        const formattedTime = `${year}-${month}-${day} ${hours}:${minutes}:${seconds}`;
+        
+        // 找到ID为 'current-time-value' 的元素并替换其内容
+        const timeElement = document.getElementById('current-time-value');
+        if (timeElement) {
+            timeElement.textContent = formattedTime;
+        }
+        // ========== 修复 2 结束 ==========
     </script>
 </body>
 </html>
