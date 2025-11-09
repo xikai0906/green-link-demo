@@ -221,6 +221,7 @@ with tab1:
             st.write(f"- **关键指标**: {analysis.get('indicator', 'N/A')}")
             st.write(f"- **分析结果**: {analysis.get('result', 'N/A')}")
         
+        
         # 显示卫星图片对比（仅上游供应商）
         if not is_cofco:
             st.markdown("**🛰️ 卫星影像对比**")
@@ -229,43 +230,45 @@ with tab1:
             img_before = evidence.get('satellite_image_before', '')
             img_after = evidence.get('satellite_image_after', '')
             
-            # 从JSON获取相对路径 (例如: "assets/satellite_images/FGV_before.png")
-            img_before = evidence.get('satellite_image_before', '')
-            img_after = evidence.get('satellite_image_after', '')
+            # 从JSON获取相对路径
             img_before_path = os.path.join(BASE_DIR, img_before) if img_before else ''
             img_after_path = os.path.join(BASE_DIR, img_after) if img_after else ''
                 
             # 使用绝对路径进行检查和显示
-        if img_before_path and img_after_path and os.path.exists(img_before_path):
-            col_img1, col_img2 = st.columns(2)
-            with col_img1:
-                st.image(img_before_path, caption="基准年", use_column_width=True)
-            with col_img2:
-                st.image(img_after_path, caption="最近年", use_column_width=True)
+            if img_before_path and img_after_path and os.path.exists(img_before_path):
+                col_img1, col_img2 = st.columns(2)
+                with col_img1:
+                    st.image(img_before_path, caption="基准年", use_column_width=True)
+                with col_img2:
+                    st.image(img_after_path, caption="最近年", use_column_width=True)
+                
+                # 显示观察结果（IOI特有）—— 这是一个独立逻辑
+                observations = evidence.get('observation', [])
+                if observations:
+                    with st.expander("📝 详细观察记录"):
+                        for obs in observations:
+                            st.write(f"- {obs}")
             
-            # 显示观察结果（IOI特有）—— 这是一个独立逻辑
-            observations = evidence.get('observation', [])
-            if observations:
-                with st.expander("📝 详细观察记录"):
-                    for obs in observations:
-                        st.write(f"- {obs}")
-        
-        else: # <-- 关键：这个 else 应该在这里，与 if os.path.exists 对齐
-            # 提示信息可以更具体一点
-            st.info(f"💡 卫星图片未找到。请确保JSON中的路径 (如: {img_before}) 正确，且文件已上传。")
-            # 结论
+            else: 
+                # 提示信息可以更具体一点
+                st.info(f"💡 卫星图片未找到。请确保JSON中的路径 (如: {img_before}) 正确，且文件已上传。")
+            
+            # 结论 (仍然在 if not is_cofco 内部)
             conclusion = evidence.get('conclusion', analysis.get('conclusion', ''))
             if conclusion:
                 st.success(f"✅ **结论**: {conclusion}")
-            else:
+        
+        else:
             # COFCO的环境表现
-                positive_actions = env.get('positive_actions', [])
+            positive_actions = env.get('positive_actions', [])
             if positive_actions:
                 st.markdown("**✅ 积极行动**")
                 for action in positive_actions:
                     st.write(f"- {action}")
         
-        # 合规状态
+        
+
+        # 合规状态 (这对所有公司都可见，所以它在 if/else 之外)
         st.markdown("**📋 法规合规性**")
         compliance = env.get('compliance', {})
         if compliance:
