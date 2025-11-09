@@ -229,22 +229,33 @@ with tab1:
             img_before = evidence.get('satellite_image_before', '')
             img_after = evidence.get('satellite_image_after', '')
             
-            if img_before and img_after and os.path.exists(img_before):
-                col_img1, col_img2 = st.columns(2)
-                with col_img1:
-                    st.image(img_before, caption="基准年", use_column_width=True)
-                with col_img2:
-                    st.image(img_after, caption="最近年", use_column_width=True)
+            # 从JSON获取相对路径 (例如: "assets/satellite_images/FGV_before.png")
+                img_before = evidence.get('satellite_image_before', '')
+                img_after = evidence.get('satellite_image_after', '')
                 
-                # 显示观察结果（IOI特有）
-                observations = evidence.get('observation', [])
-                if observations:
-                    with st.expander("📝 详细观察记录"):
-                        for obs in observations:
-                            st.write(f"- {obs}")
-            else:
-                st.info("💡 卫星图片文件未上传。请将图片放置在 `assets/satellite_images/` 目录下")
-            
+                # 使用 BASE_DIR 构建完整的绝对路径
+                # (确保 BASE_DIR 已经在脚本顶部定义了!)
+                # BASE_DIR = os.path.dirname(os.path.abspath(__file__))
+                img_before_path = os.path.join(BASE_DIR, img_before) if img_before else ''
+                img_after_path = os.path.join(BASE_DIR, img_after) if img_after else ''
+                
+                # 使用绝对路径进行检查和显示
+                if img_before_path and img_after_path and os.path.exists(img_before_path):
+                    col_img1, col_img2 = st.columns(2)
+                    with col_img1:
+                        st.image(img_before_path, caption="基准年", use_column_width=True)
+                    with col_img2:
+                        st.image(img_after_path, caption="最近年", use_column_width=True)
+                    
+                    # 显示观察结果（IOI特有）
+                    observations = evidence.get('observation', [])
+                    if observations:
+                        with st.expander("📝 详细观察记录"):
+                            for obs in observations:
+                                st.write(f"- {obs}")
+                else:
+                    # 提示信息可以更具体一点
+                    st.info(f"💡 卫星图片未找到。请确保JSON中的路径 (如: {img_before}) 正确，且文件已上传。")
             # 结论
             conclusion = evidence.get('conclusion', analysis.get('conclusion', ''))
             if conclusion:
