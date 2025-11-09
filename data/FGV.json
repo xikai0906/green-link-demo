@@ -14,7 +14,7 @@
     "status": "✅",
     "analysis": {
       "method": "Sentinel-2 卫星影像分析",
-      "period": "2018-2023",
+      "period": "2018-2022",
       "indicator": "森林覆盖变化率",
       "result": "未检测到大规模毁林活动",
       "evidence": {
@@ -152,6 +152,22 @@
         "mitigation": "保持警惕，建立持续ESG监控机制，确保问题不再复发"
       }
     ]
+  },
+  "b2b_value": {
+    "for_buyers": [
+      "✅ 实时风险预警：精准识别FGV的S风险（CBP禁令）和E风险（低毁林），避免采购决策失误",
+      "✅ 合规报告：一键生成EUDR合规报告（证明环境达标）和CBP风险报告（社会风险透明化）",
+      "✅ 成本节约：无需昂贵的第三方审计，利用绿链的另类数据（卫星+舆情）持续监控供应商"
+    ],
+    "for_investors": [
+      "📊 精准风险定价：E/S分离评分揭示了FGV的真实风险（S而非E），避免错误评估",
+      "📊 实时追踪进展：实时监控CBP请愿书进展，及时调整投资组合"
+    ]
+  },
+  "b2c_value": {
+    "consumer_trust_label": "绿链ESG认证",
+    "qr_code_traceability": "二维码扫描",
+    "messaging": "您的产品原料供应商（FGV）已通过绿链认证。我们证实其【环境表现良好】，并正密切监督其【社会风险整改】（CBP劳工问题），确保供应链透明可信。"
   },
   "greenlink_advantage": {
     "vs_traditional_rating": {
