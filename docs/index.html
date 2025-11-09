@@ -486,7 +486,6 @@
                 <div class="info-label">本产品棕榈油原料来自以下供应商：</div>
             </div>
             
-            <!-- 供应商1: IOI (中风险) -->
             <div class="supplier-card">
                 <div class="supplier-name">🌱 IOI Corporation Berhad (主要)</div>
                 <div class="info-content">
@@ -514,7 +513,6 @@
                 </div>
             </div>
             
-            <!-- 供应商2: 国内基地 (低风险) -->
             <div class="supplier-card">
                 <div class="supplier-name">🌾 中粮国内油料基地 (备选)</div>
                 <div class="info-content">
@@ -541,7 +539,6 @@
                 </div>
             </div>
             
-            <!-- ESG评分对比图表 -->
             <div class="chart-container chart-small">
                 <canvas id="supplierComparisonChart"></canvas>
             </div>
@@ -561,7 +558,6 @@
                     <button class="tab-button" onclick="switchTab('fgv')">FGV种植园</button>
                 </div>
                 
-                <!-- IOI标签页 -->
                 <div id="ioi-tab" class="tab-content active">
                     <div class="info-item">
                         <div class="info-label">验证方法</div>
@@ -571,35 +567,22 @@
                     <div class="satellite-comparison">
                         <div class="satellite-grid">
                             <div class="satellite-item" onclick="openModal('ioi2012')">
-                                <div class="satellite-placeholder">
-                                    🛰️<br>
-                                    2012年卫星图<br>
-                                    完整热带雨林
-                                </div>
+                                <img src="IOI_2012.png" alt="IOI 2012年">
                                 <div class="satellite-label">2012年 - 基准年</div>
                             </div>
                             <div class="satellite-item" onclick="openModal('ioi2019')">
-                                <div class="satellite-placeholder">
-                                    🛰️<br>
-                                    2019年卫星图<br>
-                                    大规模砍伐
-                                </div>
+                                <img src="IOI_2019.png" alt="IOI 2019年">
                                 <div class="satellite-label">2019年 - 转换期</div>
                             </div>
                         </div>
                         <div class="satellite-grid" style="margin-top: 10px;">
                             <div class="satellite-item" onclick="openModal('ioi2022')" style="grid-column: 1 / -1;">
-                                <div class="satellite-placeholder">
-                                    🛰️<br>
-                                    2022年卫星图<br>
-                                    规则棕榈园 + 保护区
-                                </div>
+                                <img src="IOI_2022.png" alt="IOI 2022年">
                                 <div class="satellite-label">2022年 - 当前状态</div>
                             </div>
                         </div>
                     </div>
                     
-                    <!-- 森林覆盖变化图表 -->
                     <div class="chart-container">
                         <canvas id="forestCoverageChart"></canvas>
                     </div>
@@ -622,7 +605,6 @@
                     </div>
                 </div>
                 
-                <!-- FGV标签页 -->
                 <div id="fgv-tab" class="tab-content">
                     <div class="info-item">
                         <div class="info-label">验证方法</div>
@@ -632,19 +614,11 @@
                     <div class="satellite-comparison">
                         <div class="satellite-grid">
                             <div class="satellite-item" onclick="openModal('fgv2014')">
-                                <div class="satellite-placeholder">
-                                    🛰️<br>
-                                    2014年卫星图<br>
-                                    种植园边界稳定
-                                </div>
+                                <img src="FGV_2014.png" alt="FGV 2014年">
                                 <div class="satellite-label">2014年 - 基准年</div>
                             </div>
                             <div class="satellite-item" onclick="openModal('fgv2022')">
-                                <div class="satellite-placeholder">
-                                    🛰️<br>
-                                    2022年卫星图<br>
-                                    无新增毁林
-                                </div>
+                                <img src="FGV_2022.png" alt="FGV 2022年">
                                 <div class="satellite-label">2022年 - 当前状态</div>
                             </div>
                         </div>
@@ -725,7 +699,6 @@
                 </div>
             </div>
             
-            <!-- 供应链风险传导图表 -->
             <div class="chart-container">
                 <canvas id="riskTransmissionChart"></canvas>
             </div>
@@ -783,7 +756,6 @@
         </div>
     </div>
     
-    <!-- 图片模态框 -->
     <div id="imageModal" class="modal" onclick="closeModal()">
         <div class="modal-content">
             <span class="modal-close" onclick="closeModal()">&times;</span>
@@ -813,25 +785,26 @@
             const modalImg = document.getElementById('modalImage');
             const caption = document.getElementById('modalCaption');
             
+            // ========== 修复：移除了所有 'assets/satellite_images/' 路径 ==========
             const imageData = {
                 'ioi2012': {
-                    src: 'assets/satellite_images/IOI_2012.png',
+                    src: 'IOI_2012.png',
                     caption: 'IOI种植园 2012年 - 完整的热带雨林覆盖'
                 },
                 'ioi2019': {
-                    src: 'assets/satellite_images/IOI_2019.png',
+                    src: 'IOI_2019.png',
                     caption: 'IOI种植园 2019年 - 大规模森林砍伐期'
                 },
                 'ioi2022': {
-                    src: 'assets/satellite_images/IOI_2022.png',
+                    src: 'IOI_2022.png',
                     caption: 'IOI种植园 2022年 - 规则棕榈园 + 保护区'
                 },
                 'fgv2014': {
-                    src: 'assets/satellite_images/FGV_2014.png',
+                    src: 'FGV_2014.png',
                     caption: 'FGV种植园 2014年 - 基准年'
                 },
                 'fgv2022': {
-                    src: 'assets/satellite_images/FGV_2022.png',
+                    src: 'FGV_2022.png',
                     caption: 'FGV种植园 2022年 - 边界稳定，无新增毁林'
                 }
             };
@@ -857,7 +830,7 @@
         
         const chartConfig = {
             responsive: true,
-            maintainAspectRatio: true,
+            maintainAspectRatio: false, /* <--- 修复：改为 false 以适应手机屏幕 */
             plugins: {
                 legend: {
                     display: true,
