@@ -13,6 +13,7 @@ st.set_page_config(
     page_title="绿链 GreenLink - ESG风险评估平台",
     page_icon="🌿",
     layout="wide",
+    font-size: 155rem,
     initial_sidebar_state="expanded"
 )
 
