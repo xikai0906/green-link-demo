@@ -4,6 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>绿链认证 - 产品溯源</title>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
     <style>
         * {
             margin: 0;
@@ -25,6 +26,12 @@
             border-radius: 20px;
             padding: 30px;
             box-shadow: 0 10px 40px rgba(0,0,0,0.3);
+            animation: fadeIn 0.5s ease-in;
+        }
+        
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
         }
         
         .header {
@@ -35,6 +42,12 @@
         .logo {
             font-size: 48px;
             margin-bottom: 10px;
+            animation: bounce 2s infinite;
+        }
+        
+        @keyframes bounce {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-10px); }
         }
         
         h1 {
@@ -48,28 +61,64 @@
             font-size: 14px;
         }
         
+        .product-info {
+            text-align: center;
+            background: #f8f9fa;
+            padding: 15px;
+            border-radius: 12px;
+            margin-bottom: 20px;
+        }
+        
+        .product-name {
+            font-size: 20px;
+            font-weight: bold;
+            color: #2c3e50;
+            margin-bottom: 5px;
+        }
+        
+        .product-spec {
+            color: #7f8c8d;
+            font-size: 14px;
+        }
+        
         .section {
             margin: 25px 0;
             padding: 20px;
             background: #f8f9fa;
             border-radius: 12px;
             border-left: 4px solid #27ae60;
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+        
+        .section:hover {
+            transform: translateX(5px);
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
         }
         
         .section h2 {
             color: #27ae60;
             font-size: 18px;
             margin-bottom: 15px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
         }
         
         .info-item {
-            margin: 10px 0;
+            margin: 12px 0;
+            line-height: 1.6;
         }
         
         .info-label {
             font-weight: bold;
             color: #34495e;
             margin-bottom: 5px;
+            font-size: 14px;
+        }
+        
+        .info-content {
+            color: #555;
+            font-size: 14px;
         }
         
         .badge {
@@ -80,15 +129,267 @@
             border-radius: 20px;
             font-size: 12px;
             margin: 5px 5px 5px 0;
+            transition: background 0.3s ease;
+        }
+        
+        .badge:hover {
+            background: #229954;
+        }
+        
+        .badge.warning {
+            background: #f39c12;
+        }
+        
+        .badge.info {
+            background: #3498db;
+        }
+        
+        .badge.danger {
+            background: #e74c3c;
+        }
+        
+        .supplier-card {
+            background: white;
+            padding: 15px;
+            border-radius: 8px;
+            margin: 10px 0;
+            border: 1px solid #e0e0e0;
+        }
+        
+        .supplier-name {
+            font-weight: bold;
+            color: #2c3e50;
+            margin-bottom: 8px;
+            font-size: 15px;
+        }
+        
+        .risk-meter {
+            display: flex;
+            gap: 10px;
+            margin-top: 10px;
+        }
+        
+        .risk-item {
+            flex: 1;
+            text-align: center;
+        }
+        
+        .risk-label {
+            font-size: 11px;
+            color: #7f8c8d;
+            margin-bottom: 5px;
+        }
+        
+        .risk-score {
+            font-size: 20px;
+            font-weight: bold;
+        }
+        
+        .risk-low { color: #27ae60; }
+        .risk-medium { color: #f39c12; }
+        .risk-high { color: #e74c3c; }
+        
+        /* 图表容器 */
+        .chart-container {
+            position: relative;
+            height: 250px;
+            margin: 20px 0;
+        }
+        
+        .chart-small {
+            height: 200px;
+        }
+        
+        /* 卫星图片对比 */
+        .satellite-comparison {
+            margin: 20px 0;
+        }
+        
+        .satellite-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 10px;
+            margin-top: 15px;
+        }
+        
+        .satellite-item {
+            position: relative;
+            border-radius: 8px;
+            overflow: hidden;
+            box-shadow: 0 3px 10px rgba(0,0,0,0.2);
+            cursor: pointer;
+            transition: transform 0.3s ease;
+        }
+        
+        .satellite-item:hover {
+            transform: scale(1.05);
+        }
+        
+        .satellite-item img {
+            width: 100%;
+            height: 180px;
+            object-fit: cover;
+            display: block;
+        }
+        
+        .satellite-label {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            background: rgba(0,0,0,0.7);
+            color: white;
+            padding: 8px;
+            font-size: 12px;
+            text-align: center;
+        }
+        
+        .satellite-placeholder {
+            width: 100%;
+            height: 180px;
+            background: linear-gradient(135deg, #2c3e50 0%, #34495e 100%);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 14px;
+            text-align: center;
+            padding: 10px;
+        }
+        
+        /* 模态框 */
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 1000;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0,0,0,0.9);
+            animation: fadeIn 0.3s ease;
+        }
+        
+        .modal-content {
+            position: relative;
+            margin: 5% auto;
+            max-width: 90%;
+            max-height: 80%;
+        }
+        
+        .modal-content img {
+            width: 100%;
+            height: auto;
+            border-radius: 10px;
+        }
+        
+        .modal-close {
+            position: absolute;
+            top: -40px;
+            right: 0;
+            color: white;
+            font-size: 35px;
+            font-weight: bold;
+            cursor: pointer;
+        }
+        
+        .modal-caption {
+            color: white;
+            text-align: center;
+            padding: 10px;
+            font-size: 16px;
+        }
+        
+        .timeline {
+            position: relative;
+            padding-left: 30px;
+            margin-top: 15px;
+        }
+        
+        .timeline::before {
+            content: '';
+            position: absolute;
+            left: 8px;
+            top: 0;
+            bottom: 0;
+            width: 2px;
+            background: #27ae60;
+        }
+        
+        .timeline-item {
+            position: relative;
+            margin-bottom: 15px;
+        }
+        
+        .timeline-item::before {
+            content: '✓';
+            position: absolute;
+            left: -25px;
+            width: 20px;
+            height: 20px;
+            background: #27ae60;
+            border-radius: 50%;
+            color: white;
+            font-size: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .timeline-title {
+            font-weight: bold;
+            color: #2c3e50;
+            font-size: 14px;
+        }
+        
+        .timeline-desc {
+            color: #7f8c8d;
+            font-size: 13px;
+            margin-top: 3px;
         }
         
         .thank-you {
             background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
             color: white;
-            padding: 20px;
+            padding: 25px;
             border-radius: 12px;
             text-align: center;
-            margin-top: 20px;
+            margin-top: 30px;
+        }
+        
+        .thank-you h2 {
+            font-size: 22px;
+            margin-bottom: 10px;
+        }
+        
+        .thank-you p {
+            font-size: 14px;
+            line-height: 1.6;
+        }
+        
+        .stats {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 10px;
+            margin-top: 15px;
+            padding-top: 15px;
+            border-top: 1px solid rgba(255,255,255,0.3);
+        }
+        
+        .stat-item {
+            text-align: center;
+        }
+        
+        .stat-value {
+            font-size: 24px;
+            font-weight: bold;
+            display: block;
+        }
+        
+        .stat-label {
+            font-size: 11px;
+            opacity: 0.9;
+            margin-top: 5px;
         }
         
         .footer {
@@ -99,205 +400,635 @@
             color: #7f8c8d;
             font-size: 12px;
         }
-
-
-        /* 1. 让卫星图片适应手机屏幕 */
-        .satellite-img {
-            width: 100%;
-            border-radius: 12px;
-            margin-top: 10px;
+        
+        .footer a {
+            color: #3498db;
+            text-decoration: none;
         }
         
-        /* 2. 时间线样式 */
-        .timeline {
-            position: relative;
-            padding-left: 25px; 
-            border-left: 2px solid #27ae60; 
+        .footer a:hover {
+            text-decoration: underline;
         }
-        .timeline-item {
-            position: relative;
-            margin-bottom: 20px;
+        
+        .alert-box {
+            background: #fff3cd;
+            border-left: 4px solid #ffc107;
+            padding: 12px 15px;
+            border-radius: 8px;
+            margin: 10px 0;
+            font-size: 13px;
+            color: #856404;
         }
-        .timeline-item:last-child {
-            margin-bottom: 0;
+        
+        .alert-box strong {
+            display: block;
+            margin-bottom: 5px;
         }
-        .timeline-item::before {
-            content: '✅'; 
-            position: absolute;
-            left: -30px; 
-            top: 0;
-            background: white;
-            padding-left: 4px; 
-            font-size: 20px;
+        
+        .tab-container {
+            margin: 15px 0;
         }
-        .timeline-date {
-            font-weight: bold;
-            color: #34495e;
-            font-size: 14px;
-        }
-        .timeline-desc {
-            font-size: 14px;
-            color: #7f8c8d;
-        }
-
-        /* 3. 加工流程样式 */
-        .process-steps {
-            margin-top: 15px;
-        }
-        .process-step {
+        
+        .tab-buttons {
             display: flex;
-            align-items: flex-start; 
-            margin-bottom: 20px;
+            gap: 10px;
+            margin-bottom: 15px;
         }
-        .process-step:last-child {
-            margin-bottom: 0;
+        
+        .tab-button {
+            flex: 1;
+            padding: 10px;
+            background: white;
+            border: 2px solid #27ae60;
+            border-radius: 8px;
+            color: #27ae60;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s ease;
         }
-        .process-icon {
-            font-size: 28px;
-            margin-right: 15px;
-            width: 40px;
-            text-align: center;
-            margin-top: 5px; /* 图标稍稍下移 */
+        
+        .tab-button:hover {
+            background: #ecf9f2;
         }
-        .process-text h3 {
-            font-size: 16px;
-            color: #34495e; 
-            margin-bottom: 3px;
+        
+        .tab-button.active {
+            background: #27ae60;
+            color: white;
         }
-        .process-text p {
-            font-size: 14px;
-            color: #7f8c8d; 
-            line-height: 1.4;
+        
+        .tab-content {
+            display: none;
         }
-
-       
-        .process-img {
-            width: 100%;
-            border-radius: 12px;
-            margin-top: 10px;
+        
+        .tab-content.active {
+            display: block;
+            animation: fadeIn 0.3s ease;
         }
-
     </style>
 </head>
 <body>
     <div class="container">
         <div class="header">
             <div class="logo">🌿</div>
-            <h1>绿链认证</h1>
-            <p class="subtitle">一瓶油的绿色旅程</p>
+            <h1>绿链认证 GreenLink</h1>
+            <p class="subtitle">基于卫星遥感与AI的供应链ESG认证</p>
+        </div>
+        
+        <div class="product-info">
+            <div class="product-name">福临门 特级调和油</div>
+            <div class="product-spec">5L 装 | 生产日期: 2024-11-01 | 批次: FL20241101</div>
         </div>
         
         <div class="section">
-            <h2>🌍 原料产地</h2>
-            <div class="info-item">
-                <div class="info-label">种植园位置</div>
-                <div>马来西亚彭亨州 FGV种植园</div>
-            </div>
-            <div class="info-item">
-                <div class="info-label">卫星验证结果</div>
-                <span class="badge">✅ Sentinel-2卫星验证</span>
-                <span class="badge">✅ 无非法毁林</span>
-                <span class="badge">✅ 符合欧盟EUDR法规</span>
-            </div>
+            <h2><span>🌍</span> 原料产地溯源</h2>
             
             <div class="info-item">
-                <div class="info-label">卫星影像对比 (2014 vs 2022)</div>
-                <img src="FGV_2014.png" alt="2014年卫星图" class="satellite-img">
-                <img src="FGV_2022.png" alt="2022年卫星图" class="satellite-img">
-                <p style="text-align: center; font-size: 12px; color: #7f8c8d; margin-top: 5px;">
-                    基于Sentinel-2卫星验证，种植园边界稳定，无非法毁林。
-                </p>
+                <div class="info-label">本产品棕榈油原料来自以下供应商：</div>
+            </div>
+            
+            <!-- 供应商1: IOI (中风险) -->
+            <div class="supplier-card">
+                <div class="supplier-name">🌱 IOI Corporation Berhad (主要)</div>
+                <div class="info-content">
+                    📍 马来西亚 沙巴州/砂拉越州<br>
+                    🏭 全球领先的综合性棕榈油企业
+                </div>
+                <div class="risk-meter">
+                    <div class="risk-item">
+                        <div class="risk-label">环境风险</div>
+                        <div class="risk-score risk-medium">55</div>
+                    </div>
+                    <div class="risk-item">
+                        <div class="risk-label">社会风险</div>
+                        <div class="risk-score risk-high">75</div>
+                    </div>
+                    <div class="risk-item">
+                        <div class="risk-label">治理风险</div>
+                        <div class="risk-score risk-low">30</div>
+                    </div>
+                </div>
+                <div style="margin-top: 10px;">
+                    <span class="badge">RSPO认证 97%+</span>
+                    <span class="badge info">零毁林承诺</span>
+                    <span class="badge warning">劳工整改中</span>
+                </div>
+            </div>
+            
+            <!-- 供应商2: 国内基地 (低风险) -->
+            <div class="supplier-card">
+                <div class="supplier-name">🌾 中粮国内油料基地 (备选)</div>
+                <div class="info-content">
+                    📍 中国 东北/华北地区<br>
+                    🏭 大豆、菜籽油自有种植基地
+                </div>
+                <div class="risk-meter">
+                    <div class="risk-item">
+                        <div class="risk-label">环境风险</div>
+                        <div class="risk-score risk-low">20</div>
+                    </div>
+                    <div class="risk-item">
+                        <div class="risk-label">社会风险</div>
+                        <div class="risk-score risk-low">15</div>
+                    </div>
+                    <div class="risk-item">
+                        <div class="risk-label">治理风险</div>
+                        <div class="risk-score risk-low">10</div>
+                    </div>
+                </div>
+                <div style="margin-top: 10px;">
+                    <span class="badge">国企规范</span>
+                    <span class="badge">本土可控</span>
+                </div>
+            </div>
+            
+            <!-- ESG评分对比图表 -->
+            <div class="chart-container chart-small">
+                <canvas id="supplierComparisonChart"></canvas>
+            </div>
+            
+            <div class="alert-box">
+                <strong>📢 供应链透明承诺</strong>
+                中粮正在降低对高风险供应商的依赖，2025年目标将IOI等海外供应商占比降至10%以下，增加国内自主可控油料基地。
             </div>
         </div>
         
         <div class="section">
-            <h2>🚚 一滴油的旅程</h2>
-            <div class="process-steps">
+            <h2><span>🛰️</span> 卫星验证结果</h2>
+            
+            <div class="tab-container">
+                <div class="tab-buttons">
+                    <button class="tab-button active" onclick="switchTab('ioi')">IOI种植园</button>
+                    <button class="tab-button" onclick="switchTab('fgv')">FGV种植园</button>
+                </div>
                 
-                <div class="process-step">
-                    <div class="process-icon">👨‍🌾</div>
-                    <div class="process-text">
-                        <h3>1. 果实采摘与收集</h3>
-                        <p>工人在 FGV 种植园手工采摘成熟的棕榈果串，并集中收集。</p>
-                        <img src="采摘.png" alt="棕榈果采摘" class="process-img">
+                <!-- IOI标签页 -->
+                <div id="ioi-tab" class="tab-content active">
+                    <div class="info-item">
+                        <div class="info-label">验证方法</div>
+                        <div class="info-content">Sentinel-2 卫星遥感影像分析（2012-2022）</div>
+                    </div>
+                    
+                    <div class="satellite-comparison">
+                        <div class="satellite-grid">
+                            <div class="satellite-item" onclick="openModal('ioi2012')">
+                                <div class="satellite-placeholder">
+                                    🛰️<br>
+                                    2012年卫星图<br>
+                                    完整热带雨林
+                                </div>
+                                <div class="satellite-label">2012年 - 基准年</div>
+                            </div>
+                            <div class="satellite-item" onclick="openModal('ioi2019')">
+                                <div class="satellite-placeholder">
+                                    🛰️<br>
+                                    2019年卫星图<br>
+                                    大规模砍伐
+                                </div>
+                                <div class="satellite-label">2019年 - 转换期</div>
+                            </div>
+                        </div>
+                        <div class="satellite-grid" style="margin-top: 10px;">
+                            <div class="satellite-item" onclick="openModal('ioi2022')" style="grid-column: 1 / -1;">
+                                <div class="satellite-placeholder">
+                                    🛰️<br>
+                                    2022年卫星图<br>
+                                    规则棕榈园 + 保护区
+                                </div>
+                                <div class="satellite-label">2022年 - 当前状态</div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- 森林覆盖变化图表 -->
+                    <div class="chart-container">
+                        <canvas id="forestCoverageChart"></canvas>
+                    </div>
+                    
+                    <div class="info-item">
+                        <div class="info-label">分析结论</div>
+                        <div class="info-content">
+                            <span class="badge warning">中风险</span><br>
+                            • 2012-2019年间存在森林转换活动（约12,000公顷）<br>
+                            • 2016年RSPO认证曾暂停5个月<br>
+                            • 2016年后承诺零毁林，已建立实时监测系统<br>
+                            • 当前保留10-15%高保护价值区域<br>
+                            • 2022年起无新增毁林证据
+                        </div>
+                    </div>
+                    
+                    <div class="info-item">
+                        <span class="badge">✅ 符合欧盟EUDR法规</span>
+                        <span class="badge">✅ 2024年合规</span>
                     </div>
                 </div>
-
-                <div class="process-step">
-                    <div class="process-icon">➡️</div>
-                    <div class="process-text">
-                        <h3>2. 快速运输</h3>
-                        <p>24小时内通过 FGV 专用卡车将果串送至压榨厂，保证新鲜度。</p>
-                        <img src="运输.png" alt="FGV运输卡车" class="process-img">
+                
+                <!-- FGV标签页 -->
+                <div id="fgv-tab" class="tab-content">
+                    <div class="info-item">
+                        <div class="info-label">验证方法</div>
+                        <div class="info-content">Sentinel-2 卫星遥感影像分析（2014-2022）</div>
+                    </div>
+                    
+                    <div class="satellite-comparison">
+                        <div class="satellite-grid">
+                            <div class="satellite-item" onclick="openModal('fgv2014')">
+                                <div class="satellite-placeholder">
+                                    🛰️<br>
+                                    2014年卫星图<br>
+                                    种植园边界稳定
+                                </div>
+                                <div class="satellite-label">2014年 - 基准年</div>
+                            </div>
+                            <div class="satellite-item" onclick="openModal('fgv2022')">
+                                <div class="satellite-placeholder">
+                                    🛰️<br>
+                                    2022年卫星图<br>
+                                    无新增毁林
+                                </div>
+                                <div class="satellite-label">2022年 - 当前状态</div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="info-item">
+                        <div class="info-label">分析结论</div>
+                        <div class="info-content">
+                            <span class="badge">环境低风险</span>
+                            <span class="badge danger">社会高风险</span><br>
+                            • 8年间种植园边界保持稳定<br>
+                            • NDVI变化率仅-2.3%（在正常范围内）<br>
+                            • 未检测到大规模毁林活动<br>
+                            • 但存在严重劳工问题（美国CBP禁令）
+                        </div>
                     </div>
                 </div>
-
-                <div class="process-step">
-                    <div class="process-icon">🏭</div>
-                    <div class="process-text">
-                        <h3>3. 压榨与精炼</h3>
-                        <p>在压榨厂进行物理压榨，并精炼成高品质食用油 (如Saji品牌)。</p>
-                        <img src="榨油场.png" alt="Saji食用油" class="process-img">
-                    </div>
-                </div>
-
-            </div>
-        </div>
-
-        <div class="section">
-            <h2>🏭 加工工厂 (中游)</h2>
-            <div class="info-item">
-                <div class="info-label">精炼与分装</div>
-                <div>中粮集团 - 福临门品牌</div>
-            </div>
-            <div class="info-item">
-                <div class="info-label">质量认证</div>
-                <span class="badge">ISO 22000</span>
-                <span class="badge">HACCP</span>
-                <span class="badge">绿链认证</span>
             </div>
         </div>
         
         <div class="section">
-            <h2>📋 可持续认证</h2>
+            <h2><span>🏭</span> 加工与生产</h2>
             <div class="info-item">
-                ✅ 绿链ESG风险评估：低环境风险<br>
-                ✅ 供应链透明度认证<br>
-                ✅ 零毁林承诺验证
+                <div class="info-label">生产商</div>
+                <div class="info-content">中粮集团 - 福临门品牌</div>
             </div>
-        </div>
-
-        <div class="section">
-            <h2>🌿 绿色里程碑</h2>
+            <div class="info-item">
+                <div class="info-label">工厂位置</div>
+                <div class="info-content">📍 中国 多地生产基地</div>
+            </div>
+            <div class="info-item">
+                <div class="info-label">质量与可持续认证</div>
+                <span class="badge">ISO 22000 食品安全</span>
+                <span class="badge">HACCP 危害分析</span>
+                <span class="badge">ISO 14001 环境管理</span>
+                <span class="badge">绿链ESG认证</span>
+            </div>
+            
             <div class="timeline">
-                
                 <div class="timeline-item">
-                    <div class="timeline-date">2014-2022年</div>
-                    <div class="timeline-desc">Sentinel-2 卫星持续监测，无毁林证据。</div>
+                    <div class="timeline-title">原料采购审核</div>
+                    <div class="timeline-desc">建立供应商ESG评分体系</div>
                 </div>
-
                 <div class="timeline-item">
-                    <div class="timeline-date">2023年 第4季度</div>
-                    <div class="timeline-desc">通过 ISO 22000 & HACCP 质量认证。</div>
+                    <div class="timeline-title">精炼加工</div>
+                    <div class="timeline-desc">现代化生产线，绿色工艺</div>
                 </div>
-
                 <div class="timeline-item">
-                    <div class="timeline-date">2024年 第2季度</div>
-                    <div class="timeline-desc">通过“绿链”ESG风险评估，评级：低环境风险。</div>
+                    <div class="timeline-title">质量检测</div>
+                    <div class="timeline-desc">多重质量管控</div>
                 </div>
-
+                <div class="timeline-item">
+                    <div class="timeline-title">包装出厂</div>
+                    <div class="timeline-desc">可追溯二维码标签</div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="section">
+            <h2><span>📋</span> ESG综合评估</h2>
+            
+            <div class="chart-container chart-small">
+                <canvas id="cofcoESGChart"></canvas>
+            </div>
+            
+            <div class="alert-box">
+                <strong>💡 绿链评级说明</strong>
+                中粮的社会风险主要来自上游供应商IOI的劳工问题传导。中粮正在积极监督供应商整改，并增加低风险供应商占比。
+            </div>
+            
+            <div class="info-item" style="margin-top: 15px;">
+                <div class="info-label">✅ 已通过认证</div>
+                <div class="info-content">
+                    • 供应链透明度认证<br>
+                    • 欧盟EUDR零毁林合规<br>
+                    • 绿链ESG风险监控<br>
+                    • 定期第三方审计
+                </div>
+            </div>
+            
+            <!-- 供应链风险传导图表 -->
+            <div class="chart-container">
+                <canvas id="riskTransmissionChart"></canvas>
+            </div>
+        </div>
+        
+        <div class="section">
+            <h2><span>🌐</span> 合规市场准入</h2>
+            <div class="info-item">
+                <div class="info-label">本产品符合以下市场法规要求：</div>
+                <span class="badge">🇪🇺 欧盟 EUDR</span>
+                <span class="badge">🇺🇸 美国 CBP监管</span>
+                <span class="badge">🇨🇳 中国食品安全</span>
+            </div>
+            <div class="info-item" style="margin-top: 10px;">
+                <div class="info-content">
+                    <strong>欧盟EUDR合规状态：</strong> ✅ 已提交尽职调查文件<br>
+                    <strong>美国市场：</strong> ⚠️ 监控上游供应商整改进展<br>
+                    <strong>国内市场：</strong> ✅ 全面合规
+                </div>
             </div>
         </div>
         
         <div class="thank-you">
             <h2>❤️ 感谢您的选择</h2>
-            <p>每一次购买绿链认证产品，都是对可持续发展的支持！</p>
+            <p>每一次购买绿链认证产品，都是对可持续供应链的支持！</p>
+            <p style="margin-top: 10px; font-size: 13px;">您正在推动企业关注ESG，让世界更美好。</p>
+            
+            <div class="stats">
+                <div class="stat-item">
+                    <span class="stat-value">3</span>
+                    <span class="stat-label">供应链层级追溯</span>
+                </div>
+                <div class="stat-item">
+                    <span class="stat-value">100%</span>
+                    <span class="stat-label">原料可追溯</span>
+                </div>
+                <div class="stat-item">
+                    <span class="stat-value">周更新</span>
+                    <span class="stat-label">风险监控频率</span>
+                </div>
+            </div>
         </div>
         
         <div class="footer">
-            <p>由 GreenLink 提供技术支持</p>
-            <p>基于卫星遥感和AI技术的供应链溯源</p>
+            <p><strong>由 GreenLink 技术驱动</strong></p>
+            <p>基于Sentinel-2卫星遥感 + AI舆情分析</p>
+            <p style="margin-top: 10px;">
+                <a href="https://github.com/yourusername/greenlink-demo" target="_blank">了解更多</a> | 
+                <a href="mailto:support@greenlink.example.com">联系我们</a>
+            </p>
+            <p style="margin-top: 15px; font-size: 11px; color: #95a5a6;">
+                溯源编号: FL-2024110901 | 查询时间: 2024-11-09 14:30<br>
+                本溯源信息由绿链平台实时生成
+            </p>
         </div>
     </div>
+    
+    <!-- 图片模态框 -->
+    <div id="imageModal" class="modal" onclick="closeModal()">
+        <div class="modal-content">
+            <span class="modal-close" onclick="closeModal()">&times;</span>
+            <img id="modalImage" src="" alt="卫星图片">
+            <div class="modal-caption" id="modalCaption"></div>
+        </div>
+    </div>
+
+    <script>
+        // 标签页切换
+        function switchTab(tabName) {
+            document.querySelectorAll('.tab-content').forEach(tab => {
+                tab.classList.remove('active');
+            });
+            
+            document.querySelectorAll('.tab-button').forEach(btn => {
+                btn.classList.remove('active');
+            });
+            
+            document.getElementById(tabName + '-tab').classList.add('active');
+            event.target.classList.add('active');
+        }
+        
+        // 图片模态框
+        function openModal(imageId) {
+            const modal = document.getElementById('imageModal');
+            const modalImg = document.getElementById('modalImage');
+            const caption = document.getElementById('modalCaption');
+            
+            const imageData = {
+                'ioi2012': {
+                    src: 'assets/satellite_images/IOI_2012.png',
+                    caption: 'IOI种植园 2012年 - 完整的热带雨林覆盖'
+                },
+                'ioi2019': {
+                    src: 'assets/satellite_images/IOI_2019.png',
+                    caption: 'IOI种植园 2019年 - 大规模森林砍伐期'
+                },
+                'ioi2022': {
+                    src: 'assets/satellite_images/IOI_2022.png',
+                    caption: 'IOI种植园 2022年 - 规则棕榈园 + 保护区'
+                },
+                'fgv2014': {
+                    src: 'assets/satellite_images/FGV_2014.png',
+                    caption: 'FGV种植园 2014年 - 基准年'
+                },
+                'fgv2022': {
+                    src: 'assets/satellite_images/FGV_2022.png',
+                    caption: 'FGV种植园 2022年 - 边界稳定，无新增毁林'
+                }
+            };
+            
+            modalImg.onerror = function() {
+                this.src = 'data:image/svg+xml,%3Csvg xmlns="http://www.w3.org/2000/svg" width="800" height="600"%3E%3Crect fill="%232c3e50" width="800" height="600"/%3E%3Ctext fill="white" font-size="24" x="50%25" y="50%25" text-anchor="middle" dominant-baseline="middle"%3E卫星图片加载中...%3C/text%3E%3C/svg%3E';
+            };
+            
+            modal.style.display = 'block';
+            modalImg.src = imageData[imageId].src;
+            caption.innerHTML = imageData[imageId].caption;
+        }
+        
+        function closeModal() {
+            document.getElementById('imageModal').style.display = 'none';
+        }
+        
+        document.addEventListener('keydown', function(event) {
+            if (event.key === 'Escape') {
+                closeModal();
+            }
+        });
+        
+        const chartConfig = {
+            responsive: true,
+            maintainAspectRatio: true,
+            plugins: {
+                legend: {
+                    display: true,
+                    position: 'top',
+                }
+            }
+        };
+        
+        // 1. 供应商ESG对比图表
+        const supplierComparisonCtx = document.getElementById('supplierComparisonChart').getContext('2d');
+        new Chart(supplierComparisonCtx, {
+            type: 'bar',
+            data: {
+                labels: ['IOI Corporation', '中粮国内基地'],
+                datasets: [
+                    {
+                        label: '环境风险',
+                        data: [55, 20],
+                        backgroundColor: 'rgba(243, 156, 18, 0.7)',
+                        borderColor: 'rgba(243, 156, 18, 1)',
+                        borderWidth: 1
+                    },
+                    {
+                        label: '社会风险',
+                        data: [75, 15],
+                        backgroundColor: 'rgba(231, 76, 60, 0.7)',
+                        borderColor: 'rgba(231, 76, 60, 1)',
+                        borderWidth: 1
+                    },
+                    {
+                        label: '治理风险',
+                        data: [30, 10],
+                        backgroundColor: 'rgba(39, 174, 96, 0.7)',
+                        borderColor: 'rgba(39, 174, 96, 1)',
+                        borderWidth: 1
+                    }
+                ]
+            },
+            options: {
+                ...chartConfig,
+                scales: {
+                    y: {
+                        beginAtZero: true,
+                        max: 100,
+                        title: {
+                            display: true,
+                            text: '风险评分 (0-100)'
+                        }
+                    }
+                },
+                plugins: {
+                    title: {
+                        display: true,
+                        text: '供应商ESG风险对比'
+                    }
+                }
+            }
+        });
+        
+        // 2. IOI森林覆盖变化图表
+        const forestCoverageCtx = document.getElementById('forestCoverageChart').getContext('2d');
+        new Chart(forestCoverageCtx, {
+            type: 'line',
+            data: {
+                labels: ['2012', '2014', '2016', '2018', '2020', '2022', '2024'],
+                datasets: [{
+                    label: '森林覆盖率 (%)',
+                    data: [85, 72, 45, 25, 15, 13, 12],
+                    borderColor: 'rgba(46, 204, 113, 1)',
+                    backgroundColor: 'rgba(46, 204, 113, 0.1)',
+                    fill: true,
+                    tension: 0.4
+                }]
+            },
+            options: {
+                ...chartConfig,
+                scales: {
+                    y: {
+                        beginAtZero: true,
+                        max: 100,
+                        title: {
+                            display: true,
+                            text: '森林覆盖率 (%)'
+                        }
+                    }
+                },
+                plugins: {
+                    title: {
+                        display: true,
+                        text: 'IOI种植园森林覆盖变化 (2012-2024)'
+                    }
+                }
+            }
+        });
+        
+        // 3. 中粮ESG雷达图
+        const cofcoESGCtx = document.getElementById('cofcoESGChart').getContext('2d');
+        new Chart(cofcoESGCtx, {
+            type: 'radar',
+            data: {
+                labels: ['环境 (E)', '社会 (S)', '治理 (G)', '供应链透明度', '合规性', '创新性'],
+                datasets: [{
+                    label: '中粮集团',
+                    data: [70, 55, 75, 80, 85, 65],
+                    backgroundColor: 'rgba(102, 126, 234, 0.2)',
+                    borderColor: 'rgba(102, 126, 234, 1)',
+                    borderWidth: 2
+                }]
+            },
+            options: {
+                ...chartConfig,
+                scales: {
+                    r: {
+                        beginAtZero: true,
+                        max: 100
+                    }
+                },
+                plugins: {
+                    title: {
+                        display: true,
+                        text: '中粮集团ESG综合评估'
+                    }
+                }
+            }
+        });
+        
+        // 4. 供应链风险传导图表
+        const riskTransmissionCtx = document.getElementById('riskTransmissionChart').getContext('2d');
+        new Chart(riskTransmissionCtx, {
+            type: 'line',
+            data: {
+                labels: ['上游种植商', '中游加工商', '下游品牌'],
+                datasets: [
+                    {
+                        label: 'IOI供应链',
+                        data: [75, 45, 30],
+                        borderColor: 'rgba(231, 76, 60, 1)',
+                        backgroundColor: 'rgba(231, 76, 60, 0.1)',
+                        fill: true,
+                        tension: 0.4
+                    },
+                    {
+                        label: '国内基地供应链',
+                        data: [15, 20, 15],
+                        borderColor: 'rgba(39, 174, 96, 1)',
+                        backgroundColor: 'rgba(39, 174, 96, 0.1)',
+                        fill: true,
+                        tension: 0.4
+                    }
+                ]
+            },
+            options: {
+                ...chartConfig,
+                scales: {
+                    y: {
+                        beginAtZero: true,
+                        max: 100,
+                        title: {
+                            display: true,
+                            text: '社会风险评分'
+                        }
+                    }
+                },
+                plugins: {
+                    title: {
+                        display: true,
+                        text: '供应链风险传导分析'
+                    }
+                }
+            }
+        });
+    </script>
 </body>
 </html>
