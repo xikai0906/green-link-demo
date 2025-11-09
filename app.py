@@ -259,7 +259,7 @@ with tab1:
                 st.success(f"✅ **结论**: {conclusion}")
             else:
             # COFCO的环境表现
-            positive_actions = env.get('positive_actions', [])
+                positive_actions = env.get('positive_actions', [])
             if positive_actions:
                 st.markdown("**✅ 积极行动**")
                 for action in positive_actions:
