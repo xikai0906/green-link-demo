@@ -1,682 +1,416 @@
 """
-PDF报告生成模块
-用于生成ESG合规报告
-支持上游供应商（FGV/IOI）和中游加工商（COFCO）的不同数据结构
+PDF报告生成模块 (v2 - 双语版)
+- 支持中英双语
+- 匹配App配色方案
+- 优化布局和可读性
 """
 
+from io import BytesIO
+from datetime import datetime
 from reportlab.lib.pagesizes import A4
 from reportlab.pdfgen import canvas
 from reportlab.lib.units import cm
 from reportlab.lib.colors import HexColor
-from io import BytesIO
-from datetime import datetime
+from reportlab.pdfbase import pdfmetrics
+from reportlab.pdfbase.ttfonts import TTFont
+import os
 
+# --- 1. 定义字体和颜色 ---
+
+# 假设字体文件在项目根目录的 'fonts' 文件夹中
+BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+FONT_REGULAR_PATH = os.path.join(BASE_DIR, 'fonts', 'SourceHanSansCN-Regular.ttf')
+FONT_BOLD_PATH = os.path.join(BASE_DIR, 'fonts', 'SourceHanSansCN-Bold.ttf')
+
+# 注册字体
+try:
+    pdfmetrics.registerFont(TTFont('SourceHanSans-Regular', FONT_REGULAR_PATH))
+    pdfmetrics.registerFont(TTFont('SourceHanSans-Bold', FONT_BOLD_PATH))
+    FONT_REG = "SourceHanSans-Regular"
+    FONT_BOLD = "SourceHanSans-Bold"
+except Exception as e:
+    print(f"警告：中文字体加载失败。PDF将回退到英文字体。错误: {e}")
+    print(f"请确保 '{FONT_REGULAR_PATH}' 存在。")
+    FONT_REG = "Helvetica"
+    FONT_BOLD = "Helvetica-Bold"
+
+# App配色方案
+COLOR_PRIMARY = HexColor("#27ae60")  # App 主绿色
+COLOR_TITLE = HexColor("#2c3e50")    # 深蓝灰色
+COLOR_TEXT = HexColor("#333333")
+COLOR_SUBTLE = HexColor("#7f8c8d")
+RISK_LOW = HexColor("#27ae60")
+RISK_MEDIUM = HexColor("#f39c12")
+RISK_HIGH = HexColor("#e74c3c")
+
+# 页面尺寸
+WIDTH, HEIGHT = A4
+MARGIN_LEFT = 2 * cm
+MARGIN_RIGHT = WIDTH - 2 * cm
+Y_START = HEIGHT - 2.5 * cm # 顶部起始Y坐标
+
+# --- 2. 辅助绘图函数 ---
+
+def draw_section_header(c, y, cn_title, en_title, color):
+    """绘制一个双语组标题"""
+    if y < 6 * cm: # 检查分页
+        c.showPage()
+        y = Y_START
+    
+    c.setFont(FONT_BOLD, 14)
+    c.setFillColor(color)
+    c.drawString(MARGIN_LEFT, y, cn_title)
+    
+    c.setFont(FONT_REG, 10)
+    c.setFillColor(COLOR_SUBTLE)
+    c.drawString(MARGIN_LEFT, y - 0.5*cm, en_title)
+    
+    c.setStrokeColor(color)
+    c.setLineWidth(1)
+    c.line(MARGIN_LEFT, y - 0.8*cm, MARGIN_RIGHT, y - 0.8*cm)
+    
+    return y - 1.8*cm # 返回新的Y坐标
+
+def draw_bilingual_field(c, y, cn_label, en_label, value_text, value_color=COLOR_TEXT):
+    """绘制一个双语标签和对应的值"""
+    if y < 4 * cm: # 检查分页
+        c.showPage()
+        y = Y_START
+    
+    c.setFont(FONT_BOLD, 10)
+    c.setFillColor(COLOR_TITLE)
+    c.drawString(MARGIN_LEFT + 0.5*cm, y, cn_label)
+    
+    c.setFont(FONT_REG, 9)
+    c.setFillColor(COLOR_SUBTLE)
+    c.drawString(MARGIN_LEFT + 0.5*cm, y - 0.4*cm, en_label)
+    
+    c.setFont(FONT_REG, 10)
+    c.setFillColor(value_color)
+    
+    # 简单的值换行
+    max_width = 12 * cm
+    line = ""
+    for char in str(value_text):
+        if c.stringWidth(line + char, FONT_REG, 10) > max_width:
+            c.drawString(MARGIN_LEFT + 5.5*cm, y, line)
+            y -= 0.5*cm
+            line = char
+        else:
+            line += char
+    c.drawString(MARGIN_LEFT + 5.5*cm, y, line)
+    
+    return y - 0.8*cm # 返回新的Y坐标
+
+def draw_wrapped_block(c, y, text_list, font_name=FONT_REG, font_size=10):
+    """绘制一个换行的文本块 (用于结论或事件描述)"""
+    c.setFont(font_name, font_size)
+    c.setFillColor(COLOR_TEXT)
+    max_width = MARGIN_RIGHT - MARGIN_LEFT - 1*cm
+    
+    for item in text_list:
+        if y < 4 * cm:
+            c.showPage()
+            y = Y_START
+            
+        # 假设 item 是一个字符串
+        words = str(item).split() if " " in str(item) else list(str(item)) # 简单的中/英分词
+        line = ""
+        for word in words:
+            word_to_add = word + (" " if " " in str(item) else "")
+            if c.stringWidth(line + word_to_add, font_name, font_size) > max_width:
+                c.drawString(MARGIN_LEFT + 1*cm, y, line)
+                y -= 0.5*cm
+                line = word_to_add
+            else:
+                line += word_to_add
+        
+        c.drawString(MARGIN_LEFT + 1*cm, y, line)
+        y -= 0.6*cm
+        
+    return y
+
+def set_risk_color(c, level, score):
+    """根据风险级别设置颜色"""
+    if "低" in level or "Low" in level or score < 40:
+        c.setFillColor(RISK_LOW)
+        return RISK_LOW
+    elif "中" in level or "Medium" in level or score < 70:
+        c.setFillColor(RISK_MEDIUM)
+        return RISK_MEDIUM
+    else:
+        c.setFillColor(RISK_HIGH)
+        return RISK_HIGH
+
+def draw_footer(c, page_num):
+    """绘制页脚"""
+    c.setFont(FONT_REG, 8)
+    c.setFillColor(COLOR_SUBTLE)
+    c.drawCentredString(WIDTH/2, 1.5*cm, f"第 {page_num} 页 (Page {page_num}) | 秘密文件 (Confidential)")
+    c.drawCentredString(WIDTH/2, 1*cm, "由绿链 (GreenLink) 平台生成 | Based on Satellite & AI Analysis")
+
+# --- 3. 主生成函数 ---
 
 def generate_pdf_report(data):
     """
-    生成ESG合规报告PDF
-    
-    参数:
-        data: 包含公司ESG数据的字典
-    
-    返回:
-        BytesIO: PDF文件的字节流
+    生成ESG合规报告PDF (v2 - 双语版)
     """
-    
     buffer = BytesIO()
     c = canvas.Canvas(buffer, pagesize=A4)
-    width, height = A4
+    c.setTitle(f"{data.get('company', 'Report')} - ESG Report")
     
-    # 设置页边距
-    margin_left = 2 * cm
-    margin_right = width - 2 * cm
-    
-    # 判断数据类型
+    # --- 变量准备 ---
     company_name = data.get('company', '未知公司')
     is_cofco = 'COFCO' in company_name or '中粮' in company_name
-    is_ioi = 'IOI' in company_name
+    env_data = data.get('environment', {})
+    social_data = data.get('social', {})
+    supply_chain_data = data.get('supply_chain', {})
+    page_num = 1
     
-    # ========== 第一页：封面 ==========
+    # ==================================================
+    # ========== 第一页：封面 (Cover Page) ==========
+    # ==================================================
     
-    # 顶部logo区域（绿色背景）
-    c.setFillColorRGB(0.15, 0.68, 0.38)
-    c.rect(0, height - 5*cm, width, 5*cm, fill=True, stroke=False)
+    # 顶部Logo背景
+    c.setFillColor(COLOR_PRIMARY)
+    c.rect(0, HEIGHT - 5*cm, WIDTH, 5*cm, fill=True, stroke=False)
     
-    # 标题（白色文字）
-    c.setFillColorRGB(1, 1, 1)
-    c.setFont("Helvetica-Bold", 28)
-    c.drawCentredString(width/2, height - 3*cm, "GreenLink")
+    # 标题
+    c.setFillColor(HexColor("#FFFFFF"))
+    c.setFont(FONT_BOLD, 32)
+    c.drawCentredString(WIDTH/2, HEIGHT - 2.8*cm, "绿链 (GreenLink)")
     
-    c.setFont("Helvetica", 16)
-    c.drawCentredString(width/2, height - 4*cm, "ESG Risk Assessment Report")
+    c.setFont(FONT_REG, 16)
+    c.drawCentredString(WIDTH/2, HEIGHT - 3.8*cm, "ESG 风险评估报告 (ESG Risk Assessment Report)")
     
     # 公司名称
-    c.setFillColorRGB(0, 0, 0)
-    c.setFont("Helvetica-Bold", 20)
-    c.drawCentredString(width/2, height - 8*cm, company_name)
+    c.setFillColor(COLOR_TITLE)
+    c.setFont(FONT_BOLD, 22)
+    c.drawCentredString(WIDTH/2, HEIGHT - 7.5*cm, company_name)
     
-    # 公司描述
-    if 'description' in data:
-        c.setFont("Helvetica", 11)
-        c.drawCentredString(width/2, height - 8.8*cm, data['description'][:80])
+    # 报告信息
+    y = HEIGHT - 10*cm
+    c.setFont(FONT_REG, 11)
+    c.drawCentredString(WIDTH/2, y, f"报告日期 (Report Date): {datetime.now().strftime('%Y-%m-%d')}")
+    y -= 0.6*cm
     
-    # 报告信息框
-    c.setStrokeColorRGB(0.8, 0.8, 0.8)
-    c.setLineWidth(1)
-    c.rect(margin_left, height - 12*cm, margin_right - margin_left, 3.5*cm, fill=False, stroke=True)
-    
-    c.setFont("Helvetica", 11)
-    c.drawString(margin_left + 0.5*cm, height - 10*cm, f"Report Date: {datetime.now().strftime('%B %d, %Y')}")
-    c.drawString(margin_left + 0.5*cm, height - 10.7*cm, f"Report Type: Supply Chain ESG Compliance")
-    
-    # 根据公司类型显示不同信息
     if is_cofco:
-        c.drawString(margin_left + 0.5*cm, height - 11.4*cm, f"Company Type: Midstream Processor / Buyer")
+        company_type_cn = "中游加工商 / 采购商"
+        company_type_en = "Midstream Processor / Buyer"
     else:
-        c.drawString(margin_left + 0.5*cm, height - 11.4*cm, f"Company Type: Upstream Supplier / Plantation")
+        company_type_cn = "上游供应商 / 种植商"
+        company_type_en = "Upstream Supplier / Plantation"
+        
+    c.drawCentredString(WIDTH/2, y, f"公司类型 (Company Type): {company_type_cn} ({company_type_en})")
+    y -= 0.6*cm
     
-    # 获取分析周期
-    analysis_period = "2018 - 2024"
-    if 'environment' in data and 'analysis' in data['environment']:
-        period = data['environment']['analysis'].get('period', '2018 - 2024')
-        analysis_period = period
+    period = env_data.get('analysis', {}).get('period', 'N/A')
+    c.drawCentredString(WIDTH/2, y, f"评估周期 (Assessment Period): {period}")
     
-    c.drawString(margin_left + 0.5*cm, height - 12.1*cm, f"Assessment Period: {analysis_period}")
-    
-    # 风险等级概览
-    y_pos = height - 15*cm
-    c.setFont("Helvetica-Bold", 14)
-    c.drawString(margin_left, y_pos, "Risk Level Overview")
-    
-    y_pos -= 1*cm
+    # --- 风险概览 ---
+    y = HEIGHT - 15*cm
+    y = draw_section_header(c, y, "风险等级概览", "Risk Level Overview", COLOR_PRIMARY)
     
     # 环境风险
-    c.setFont("Helvetica", 11)
-    c.drawString(margin_left + 0.5*cm, y_pos, "Environmental Risk (E):")
-    c.setFont("Helvetica-Bold", 11)
-    
-    e_score = data['environment'].get('risk_score', 0)
-    e_level = data['environment'].get('risk_level', '未知')
-    
-    if e_score < 40 or "低" in e_level or "Low" in e_level:
-        c.setFillColorRGB(0.15, 0.68, 0.38)  # 绿色
-    elif e_score < 70:
-        c.setFillColorRGB(0.95, 0.61, 0.07)  # 橙色
-    else:
-        c.setFillColorRGB(0.91, 0.30, 0.24)  # 红色
-    
-    c.drawString(margin_left + 6*cm, y_pos, f"{e_level} ({e_score}/100)")
+    e_level = env_data.get('risk_level', '未知')
+    e_score = env_data.get('risk_score', 0)
+    e_color = set_risk_color(c, e_level, e_score)
+    y = draw_bilingual_field(c, y, "环境风险 (E)", "Environmental Risk (E)", 
+                             f"{e_level} ({e_score}/100)", value_color=e_color)
     
     # 社会风险
-    y_pos -= 0.8*cm
-    c.setFillColorRGB(0, 0, 0)
-    c.setFont("Helvetica", 11)
-    c.drawString(margin_left + 0.5*cm, y_pos, "Social Risk (S):")
-    c.setFont("Helvetica-Bold", 11)
+    s_level = social_data.get('risk_level', '未知')
+    s_score = social_data.get('risk_score', 0)
+    s_color = set_risk_color(c, s_level, s_score)
+    y = draw_bilingual_field(c, y, "社会风险 (S)", "Social Risk (S)", 
+                             f"{s_level} ({s_score}/100)", value_color=s_color)
+
+    # --- 优势 ---
+    y -= 1*cm
+    y = draw_section_header(c, y, "绿链评估优势", "GreenLink Advantage", COLOR_TITLE)
     
-    s_score = data['social'].get('risk_score', 0)
-    s_level = data['social'].get('risk_level', '未知')
+    advantages = [
+        ("✓ 实时卫星监控 (E)", "Real-time satellite monitoring (Environment)"),
+        ("✓ AI驱动舆情分析 (S)", "AI-powered sentiment analysis (Social)"),
+        ("✓ E/S分离评分", "Separated E/S risk scoring for precision"),
+        ("✓ 欧盟EUDR合规验证", "EU Deforestation Regulation (EUDR) validation")
+    ]
     
-    if s_score < 40 or "低" in s_level or "Low" in s_level:
-        c.setFillColorRGB(0.15, 0.68, 0.38)  # 绿色
-    elif s_score < 70:
-        c.setFillColorRGB(0.95, 0.61, 0.07)  # 橙色
-    else:
-        c.setFillColorRGB(0.91, 0.30, 0.24)  # 红色
-    
-    c.drawString(margin_left + 6*cm, y_pos, f"{s_level} ({s_score}/100)")
-    
-    # 治理风险（如果有）
-    if 'governance' in data:
-        y_pos -= 0.8*cm
-        c.setFillColorRGB(0, 0, 0)
-        c.setFont("Helvetica", 11)
-        c.drawString(margin_left + 0.5*cm, y_pos, "Governance Risk (G):")
-        c.setFont("Helvetica-Bold", 11)
-        
-        g_score = data['governance'].get('risk_score', 0)
-        g_level = data['governance'].get('risk_level', '低风险')
-        
-        if g_score < 40:
-            c.setFillColorRGB(0.15, 0.68, 0.38)
-        else:
-            c.setFillColorRGB(0.95, 0.61, 0.07)
-        
-        c.drawString(margin_left + 6*cm, y_pos, f"{g_level} ({g_score}/100)")
-    
-    # GreenLink优势说明
-    y_pos -= 1.5*cm
-    c.setFillColorRGB(0, 0, 0)
-    c.setFont("Helvetica-Bold", 12)
-    c.drawString(margin_left, y_pos, "GreenLink Assessment Advantage:")
-    
-    y_pos -= 0.7*cm
-    c.setFont("Helvetica", 9)
-    c.drawString(margin_left + 0.5*cm, y_pos, "✓ Real-time satellite monitoring (weekly updates)")
-    y_pos -= 0.5*cm
-    c.drawString(margin_left + 0.5*cm, y_pos, "✓ AI-powered sentiment analysis")
-    y_pos -= 0.5*cm
-    c.drawString(margin_left + 0.5*cm, y_pos, "✓ Separated E/S risk scoring (not aggregated like MSCI)")
-    y_pos -= 0.5*cm
-    c.drawString(margin_left + 0.5*cm, y_pos, "✓ 90% cost reduction vs traditional ESG ratings")
-    
-    # 页脚
-    c.setFillColorRGB(0.5, 0.5, 0.5)
-    c.setFont("Helvetica-Oblique", 8)
-    c.drawCentredString(width/2, 2*cm, "Page 1 | Confidential")
-    c.drawCentredString(width/2, 1.5*cm, "Generated by GreenLink Platform | Based on Satellite & AI Analysis")
-    
+    c.setFont(FONT_REG, 10)
+    for cn_adv, en_adv in advantages:
+        c.setFillColor(COLOR_TEXT)
+        c.drawString(MARGIN_LEFT + 0.5*cm, y, cn_adv)
+        c.setFillColor(COLOR_SUBTLE)
+        c.drawString(MARGIN_LEFT + 0.5*cm, y - 0.4*cm, en_adv)
+        y -= 0.8*cm
+
+    draw_footer(c, page_num)
     c.showPage()
+    page_num += 1
+
+    # ==================================================
+    # ========== 第二页：环境风险 (E) ==========
+    # ==================================================
+    y = Y_START
+    y = draw_section_header(c, y, "环境风险分析 (E)", "Environmental Risk Analysis (E)", COLOR_PRIMARY)
     
-    # ========== 第二页：环境风险详细分析 ==========
+    env_analysis = env_data.get('analysis', {})
     
-    y_pos = height - 3*cm
+    y = draw_bilingual_field(c, y, "分析方法", "Analysis Method", env_analysis.get('method', 'N/A'))
+    y = draw_bilingual_field(c, y, "分析周期", "Analysis Period", env_analysis.get('period', 'N/A'))
     
-    # 页眉
-    c.setFont("Helvetica-Bold", 16)
-    c.setFillColorRGB(0, 0, 0)
-    c.drawString(margin_left, y_pos, "Environmental Risk Analysis (E)")
-    
-    y_pos -= 0.3*cm
-    c.setStrokeColorRGB(0.15, 0.68, 0.38)
-    c.setLineWidth(2)
-    c.line(margin_left, y_pos, margin_right, y_pos)
-    
-    y_pos -= 1.2*cm
-    
-    # 分析方法
-    c.setFillColorRGB(0, 0, 0)
-    c.setFont("Helvetica-Bold", 11)
-    c.drawString(margin_left + 0.5*cm, y_pos, "Analysis Method:")
-    c.setFont("Helvetica", 10)
-    
-    env_analysis = data['environment'].get('analysis', {})
-    method = env_analysis.get('method', 'N/A')
-    c.drawString(margin_left + 4*cm, y_pos, method[:60])
-    
-    y_pos -= 0.6*cm
-    c.setFont("Helvetica-Bold", 11)
-    c.drawString(margin_left + 0.5*cm, y_pos, "Analysis Period:")
-    c.setFont("Helvetica", 10)
-    period = env_analysis.get('period', 'N/A')
-    c.drawString(margin_left + 4*cm, y_pos, period)
-    
-    y_pos -= 0.8*cm
-    
-    # COFCO特殊处理
+    y -= 0.5*cm
+    c.setFont(FONT_BOLD, 10)
+    c.setFillColor(COLOR_TITLE)
+    c.drawString(MARGIN_LEFT + 0.5*cm, y, "关键发现 / 结论")
+    c.setFont(FONT_REG, 9)
+    c.setFillColor(COLOR_SUBTLE)
+    c.drawString(MARGIN_LEFT + 0.5*cm, y - 0.4*cm, "Key Findings / Conclusion")
+    y -= 1*cm
+
     if is_cofco:
-        c.setFont("Helvetica-Bold", 11)
-        c.drawString(margin_left + 0.5*cm, y_pos, "Key Findings:")
-        y_pos -= 0.6*cm
-        
-        key_findings = env_analysis.get('key_findings', [])
-        c.setFont("Helvetica", 10)
-        for finding in key_findings[:4]:
-            if y_pos < 5*cm:
-                c.showPage()
-                y_pos = height - 3*cm
-            c.drawString(margin_left + 1*cm, y_pos, f"• {finding}")
-            y_pos -= 0.5*cm
-        
-        y_pos -= 0.5*cm
-        c.setFont("Helvetica-Bold", 11)
-        c.drawString(margin_left + 0.5*cm, y_pos, "Conclusion:")
-        y_pos -= 0.6*cm
-        
-        conclusion = env_analysis.get('conclusion', '')
+        findings = env_analysis.get('key_findings', ['N/A'])
+        y = draw_wrapped_block(c, y, [f"• {f}" for f in findings])
+        y -= 0.5*cm
+        y = draw_wrapped_block(c, y, [f"结论: {env_analysis.get('conclusion', 'N/A')}"], FONT_BOLD, 10)
     else:
-        # FGV/IOI的数据结构
-        c.setFont("Helvetica-Bold", 11)
-        c.drawString(margin_left + 0.5*cm, y_pos, "Conclusion:")
-        y_pos -= 0.6*cm
-        
         evidence = env_analysis.get('evidence', {})
-        conclusion = evidence.get('conclusion', env_analysis.get('result', ''))
-        
-        # IOI特有的观察记录
-        if is_ioi:
-            observations = evidence.get('observation', [])
-            if observations:
-                c.setFont("Helvetica-Bold", 11)
-                c.drawString(margin_left + 0.5*cm, y_pos, "Satellite Observations:")
-                y_pos -= 0.6*cm
-                
-                c.setFont("Helvetica", 9)
-                for obs in observations[:3]:
-                    if y_pos < 5*cm:
-                        c.showPage()
-                        y_pos = height - 3*cm
-                    
-                    # 文本换行
-                    words = obs.split()
-                    line = ""
-                    for word in words:
-                        test_line = line + word + " "
-                        if c.stringWidth(test_line, "Helvetica", 9) > 15*cm:
-                            c.drawString(margin_left + 1*cm, y_pos, line)
-                            y_pos -= 0.4*cm
-                            line = word + " "
-                        else:
-                            line = test_line
-                    if line:
-                        c.drawString(margin_left + 1*cm, y_pos, line)
-                    y_pos -= 0.6*cm
-                
-                y_pos -= 0.5*cm
+        conclusion = evidence.get('conclusion', env_analysis.get('result', 'N/A'))
+        y = draw_wrapped_block(c, y, [conclusion])
     
-    # 打印结论（通用）
-    c.setFont("Helvetica", 10)
-    words = conclusion.split()
-    line = ""
-    for word in words:
-        test_line = line + word + " "
-        if c.stringWidth(test_line, "Helvetica", 10) > 16*cm:
-            c.drawString(margin_left + 1*cm, y_pos, line)
-            y_pos -= 0.5*cm
-            if y_pos < 5*cm:
-                c.showPage()
-                y_pos = height - 3*cm
-            line = word + " "
-        else:
-            line = test_line
-    if line:
-        c.drawString(margin_left + 1*cm, y_pos, line)
+    y -= 1*cm
+    y = draw_bilingual_field(c, y, "法规合规性", "Regulatory Compliance", "")
     
-    y_pos -= 1*cm
-    
-    # 合规状态
-    if 'compliance' in data['environment']:
-        c.setFont("Helvetica-Bold", 11)
-        c.drawString(margin_left + 0.5*cm, y_pos, "Regulatory Compliance:")
-        y_pos -= 0.6*cm
-        
-        compliance = data['environment']['compliance']
-        c.setFont("Helvetica", 10)
-        for key, value in compliance.items():
-            if y_pos < 5*cm:
-                c.showPage()
-                y_pos = height - 3*cm
-            c.drawString(margin_left + 1*cm, y_pos, f"{value}")
-            y_pos -= 0.5*cm
-    
-    # 页脚
-    c.setFillColorRGB(0.5, 0.5, 0.5)
-    c.setFont("Helvetica-Oblique", 8)
-    c.drawCentredString(width/2, 2*cm, "Page 2 | Confidential")
-    
-    c.showPage()
-    
-    # ========== 第三页：社会风险详细分析 ==========
-    
-    y_pos = height - 3*cm
-    
-    c.setFont("Helvetica-Bold", 16)
-    c.setFillColorRGB(0, 0, 0)
-    c.drawString(margin_left, y_pos, "Social Risk Analysis (S)")
-    
-    y_pos -= 0.3*cm
-    c.setStrokeColorRGB(0.91, 0.30, 0.24)
-    c.setLineWidth(2)
-    c.line(margin_left, y_pos, margin_right, y_pos)
-    
-    y_pos -= 1.2*cm
-    
-    # COFCO特殊说明
-    if is_cofco:
-        social_analysis = data['social'].get('analysis', {})
-        if social_analysis:
-            c.setFont("Helvetica-Bold", 11)
-            c.drawString(margin_left + 0.5*cm, y_pos, "Risk Source:")
-            c.setFont("Helvetica", 10)
-            c.drawString(margin_left + 4*cm, y_pos, social_analysis.get('risk_source', 'N/A'))
-            
-            y_pos -= 0.6*cm
-            c.setFont("Helvetica-Bold", 11)
-            c.drawString(margin_left + 0.5*cm, y_pos, "Key Concern:")
-            y_pos -= 0.5*cm
-            
-            concern = social_analysis.get('key_concern', '')
-            c.setFont("Helvetica", 10)
-            words = concern.split()
-            line = ""
-            for word in words:
-                test_line = line + word + " "
-                if c.stringWidth(test_line, "Helvetica", 10) > 15*cm:
-                    c.drawString(margin_left + 1*cm, y_pos, line)
-                    y_pos -= 0.5*cm
-                    line = word + " "
-                else:
-                    line = test_line
-            if line:
-                c.drawString(margin_left + 1*cm, y_pos, line)
-            
-            y_pos -= 1*cm
-    
-    # 关键事件
-    c.setFont("Helvetica-Bold", 11)
-    c.drawString(margin_left + 0.5*cm, y_pos, "Key Risk Events:")
-    
-    y_pos -= 0.7*cm
-    
-    # 显示最多5个关键事件
-    key_events = data['social'].get('key_events', [])
-    c.setFont("Helvetica", 9)
-    
-    for idx, event in enumerate(key_events[:5]):
-        if y_pos < 6*cm:
-            c.showPage()
-            y_pos = height - 3*cm
-        
-        # 事件日期和标题
-        c.setFont("Helvetica-Bold", 10)
-        event_date = event.get('date', event.get('year', 'N/A'))
-        c.drawString(margin_left + 1*cm, y_pos, f"Event {idx+1}: {event_date}")
-        
-        y_pos -= 0.5*cm
-        
-        # 事件描述
-        c.setFont("Helvetica", 9)
-        event_text = event.get('event', 'N/A')
-        if len(event_text) > 100:
-            event_text = event_text[:100] + "..."
-        
-        words = event_text.split()
-        line = ""
-        for word in words:
-            test_line = line + word + " "
-            if c.stringWidth(test_line, "Helvetica", 9) > 15*cm:
-                c.drawString(margin_left + 1.5*cm, y_pos, line)
-                y_pos -= 0.4*cm
-                line = word + " "
-            else:
-                line = test_line
-        if line:
-            c.drawString(margin_left + 1.5*cm, y_pos, line)
-        
-        # 影响说明
-        y_pos -= 0.4*cm
-        impact_text = event.get('impact', 'N/A')
-        if len(impact_text) > 80:
-            impact_text = impact_text[:80] + "..."
-        c.drawString(margin_left + 1.5*cm, y_pos, f"Impact: {impact_text}")
-        
-        # 严重程度（如果有）
-        if 'severity' in event:
-            y_pos -= 0.4*cm
-            severity = event['severity']
-            if severity in ['严重', '高', 'High', 'Severe']:
-                c.setFillColorRGB(0.91, 0.30, 0.24)
-            elif severity in ['中', '中等', 'Medium']:
-                c.setFillColorRGB(0.95, 0.61, 0.07)
-            else:
-                c.setFillColorRGB(0.15, 0.68, 0.38)
-            c.drawString(margin_left + 1.5*cm, y_pos, f"Severity: {severity}")
-            c.setFillColorRGB(0, 0, 0)
-        
-        y_pos -= 0.8*cm
-    
-    # 风险缓解措施（COFCO/IOI）
-    if 'risk_mitigation' in data['social']:
-        if y_pos < 8*cm:
-            c.showPage()
-            y_pos = height - 3*cm
-        
-        y_pos -= 0.5*cm
-        c.setFont("Helvetica-Bold", 11)
-        c.drawString(margin_left + 0.5*cm, y_pos, "Risk Mitigation Actions:")
-        y_pos -= 0.6*cm
-        
-        c.setFont("Helvetica", 9)
-        for action in data['social']['risk_mitigation'][:4]:
-            if y_pos < 5*cm:
-                c.showPage()
-                y_pos = height - 3*cm
-            c.drawString(margin_left + 1*cm, y_pos, f"• {action}")
-            y_pos -= 0.5*cm
-    
-    # 页脚
-    c.setFillColorRGB(0.5, 0.5, 0.5)
-    c.setFont("Helvetica-Oblique", 8)
-    c.drawCentredString(width/2, 2*cm, "Page 3 | Confidential")
-    
-    c.showPage()
-    
-    # ========== 第四页：供应链分析（如果有）==========
-    
-    if 'supply_chain' in data:
-        y_pos = height - 3*cm
-        
-        c.setFont("Helvetica-Bold", 16)
-        c.setFillColorRGB(0, 0, 0)
-        c.drawString(margin_left, y_pos, "Supply Chain Risk Analysis")
-        
-        y_pos -= 0.3*cm
-        c.setStrokeColorRGB(0.15, 0.68, 0.38)
-        c.setLineWidth(2)
-        c.line(margin_left, y_pos, margin_right, y_pos)
-        
-        y_pos -= 1.2*cm
-        
-        supply_chain = data['supply_chain']
-        
-        if is_cofco:
-            # COFCO视角：展示上游供应商
-            if 'upstream' in supply_chain:
-                c.setFont("Helvetica-Bold", 12)
-                c.drawString(margin_left, y_pos, "Upstream Suppliers Risk Assessment:")
-                y_pos -= 0.8*cm
-                
-                upstream = supply_chain['upstream']
-                suppliers = upstream.get('suppliers', [])
-                
-                c.setFont("Helvetica", 10)
-                for supplier in suppliers[:3]:
-                    if y_pos < 6*cm:
-                        c.showPage()
-                        y_pos = height - 3*cm
-                    
-                    c.setFont("Helvetica-Bold", 10)
-                    c.drawString(margin_left + 0.5*cm, y_pos, supplier.get('name', 'N/A'))
-                    y_pos -= 0.5*cm
-                    
-                    c.setFont("Helvetica", 9)
-                    c.drawString(margin_left + 1*cm, y_pos, f"Location: {supplier.get('country', 'N/A')}")
-                    y_pos -= 0.4*cm
-                    c.drawString(margin_left + 1*cm, y_pos, f"Product: {supplier.get('product', 'N/A')}")
-                    y_pos -= 0.4*cm
-                    
-                    risk_status = supplier.get('risk_status', 'N/A')
-                    if '高' in risk_status or 'High' in risk_status:
-                        c.setFillColorRGB(0.91, 0.30, 0.24)
-                    elif '低' in risk_status or 'Low' in risk_status:
-                        c.setFillColorRGB(0.15, 0.68, 0.38)
-                    else:
-                        c.setFillColorRGB(0.95, 0.61, 0.07)
-                    
-                    c.drawString(margin_left + 1*cm, y_pos, f"Risk Status: {risk_status}")
-                    c.setFillColorRGB(0, 0, 0)
-                    
-                    if supplier.get('note'):
-                        y_pos -= 0.4*cm
-                        c.setFont("Helvetica-Oblique", 8)
-                        c.drawString(margin_left + 1*cm, y_pos, supplier['note'][:70])
-                    
-                    y_pos -= 0.8*cm
-                
-                # 风险传导路径
-                risk_paths = upstream.get('risk_transmission_path', [])
-                if risk_paths:
-                    y_pos -= 0.5*cm
-                    c.setFont("Helvetica-Bold", 11)
-                    c.drawString(margin_left, y_pos, "Risk Transmission Pathways:")
-                    y_pos -= 0.6*cm
-                    
-                    c.setFont("Helvetica", 9)
-                    for path in risk_paths:
-                        if y_pos < 5*cm:
-                            c.showPage()
-                            y_pos = height - 3*cm
-                        c.drawString(margin_left + 0.5*cm, y_pos, f"→ {path}")
-                        y_pos -= 0.5*cm
-        
-        else:
-            # FGV/IOI视角：展示下游影响
-            if 'downstream' in supply_chain:
-                downstream = supply_chain['downstream']
-                
-                c.setFont("Helvetica-Bold", 12)
-                c.drawString(margin_left, y_pos, "Downstream Market Impact:")
-                y_pos -= 0.8*cm
-                
-                # 主要客户（IOI）
-                major_customers = downstream.get('major_customers', [])
-                if major_customers:
-                    c.setFont("Helvetica-Bold", 10)
-                    c.drawString(margin_left + 0.5*cm, y_pos, "Major Customers:")
-                    y_pos -= 0.5*cm
-                    
-                    c.setFont("Helvetica", 9)
-                    for customer in major_customers[:8]:
-                        if y_pos < 5*cm:
-                            c.showPage()
-                            y_pos = height - 3*cm
-                        c.drawString(margin_left + 1*cm, y_pos, f"• {customer}")
-                        y_pos -= 0.4*cm
-                    
-                    y_pos -= 0.5*cm
-                
-                # 市场
-                markets = downstream.get('markets', [])
-                if markets:
-                    c.setFont("Helvetica-Bold", 10)
-                    c.drawString(margin_left + 0.5*cm, y_pos, "Target Markets:")
-                    y_pos -= 0.5*cm
-                    
-                    c.setFont("Helvetica", 9)
-                    for market in markets[:5]:
-                        if isinstance(market, dict):
-                            region = market.get('region', market)
-                            c.drawString(margin_left + 1*cm, y_pos, f"• {region}")
-                        else:
-                            c.drawString(margin_left + 1*cm, y_pos, f"• {market}")
-                        y_pos -= 0.4*cm
-        
-        # 页脚
-        c.setFillColorRGB(0.5, 0.5, 0.5)
-        c.setFont("Helvetica-Oblique", 8)
-        c.drawCentredString(width/2, 2*cm, "Page 4 | Confidential")
-        
-        c.showPage()
-    
-    # ========== 最后一页：建议措施 ==========
-    
-    y_pos = height - 3*cm
-    
-    c.setFont("Helvetica-Bold", 16)
-    c.setFillColorRGB(0, 0, 0)
-    c.drawString(margin_left, y_pos, "Recommended Actions")
-    
-    y_pos -= 0.3*cm
-    c.setStrokeColorRGB(0.15, 0.68, 0.38)
-    c.setLineWidth(2)
-    c.line(margin_left, y_pos, margin_right, y_pos)
-    
-    y_pos -= 1.5*cm
-    
-    # 如果数据中有recommendations，使用它
-    if 'recommendations' in data:
-        recommendations = data['recommendations']
-        
-        if 'immediate' in recommendations:
-            c.setFillColorRGB(0, 0, 0)
-            c.setFont("Helvetica-Bold", 12)
-            c.drawString(margin_left, y_pos, "Immediate Actions:")
-            y_pos -= 0.8*cm
-            
-            c.setFont("Helvetica", 10)
-            for idx, rec in enumerate(recommendations['immediate'][:4], 1):
-                c.drawString(margin_left + 0.5*cm, y_pos, f"{idx}. {rec}")
-                y_pos -= 0.6*cm
-            
-            y_pos -= 0.5*cm
-        
-        if 'medium_term' in recommendations:
-            c.setFont("Helvetica-Bold", 12)
-            c.drawString(margin_left, y_pos, "Medium-term Actions:")
-            y_pos -= 0.8*cm
-            
-            c.setFont("Helvetica", 10)
-            for idx, rec in enumerate(recommendations['medium_term'][:4], 1):
-                if y_pos < 5*cm:
-                    c.showPage()
-                    y_pos = height - 3*cm
-                c.drawString(margin_left + 0.5*cm, y_pos, f"{idx}. {rec}")
-                y_pos -= 0.6*cm
-    
+    compliance = env_data.get('compliance', {})
+    if compliance:
+        y = draw_wrapped_block(c, y, [f"• {v}" for v in compliance.values()])
     else:
-        # 默认建议
-        c.setFillColorRGB(0, 0, 0)
-        c.setFont("Helvetica-Bold", 12)
-        c.drawString(margin_left, y_pos, "Immediate Actions:")
+        y = draw_wrapped_block(c, y, ["• 无数据 (No data)"])
+    
+    draw_footer(c, page_num)
+    c.showPage()
+    page_num += 1
+    
+    # ==================================================
+    # ========== 第三页：社会风险 (S) ==========
+    # ==================================================
+    y = Y_START
+    y = draw_section_header(c, y, "社会风险分析 (S)", "Social Risk Analysis (S)", RISK_HIGH)
+
+    if is_cofco:
+        social_analysis = social_data.get('analysis', {})
+        y = draw_bilingual_field(c, y, "风险来源", "Risk Source", social_analysis.get('risk_source', 'N/A'))
+        y = draw_bilingual_field(c, y, "关键问题", "Key Concern", "")
+        y = draw_wrapped_block(c, y, [social_analysis.get('key_concern', 'N/A')])
+        y -= 1*cm
+    
+    # --- 关键事件 ---
+    c.setFont(FONT_BOLD, 10)
+    c.setFillColor(COLOR_TITLE)
+    c.drawString(MARGIN_LEFT + 0.5*cm, y, "关键风险事件")
+    c.setFont(FONT_REG, 9)
+    c.setFillColor(COLOR_SUBTLE)
+    c.drawString(MARGIN_LEFT + 0.5*cm, y - 0.4*cm, "Key Risk Events")
+    y -= 1*cm
+    
+    key_events = social_data.get('key_events', [])
+    if not key_events:
+        y = draw_wrapped_block(c, y, ["未发现重大负面舆情事件 (No significant negative events found)"])
+    
+    for event in key_events[:4]: # 最多显示4个
+        if y < 8 * cm:
+            c.showPage()
+            y = Y_START
+            y = draw_section_header(c, y, "社会风险分析 (S) - 续", "Social Risk Analysis (S) - Cont.", RISK_HIGH)
+            c.setFont(FONT_BOLD, 10)
+            c.setFillColor(COLOR_TITLE)
+            c.drawString(MARGIN_LEFT + 0.5*cm, y, "关键风险事件 (续)")
+            c.setFont(FONT_REG, 9)
+            c.setFillColor(COLOR_SUBTLE)
+            c.drawString(MARGIN_LEFT + 0.5*cm, y - 0.4*cm, "Key Risk Events (Cont.)")
+            y -= 1*cm
+            
+        event_date = event.get('date', event.get('year', 'N/A'))
+        event_text = event.get('event', 'N/A')
+        event_impact = event.get('impact', 'N/A')
         
-        y_pos -= 0.8*cm
+        y = draw_bilingual_field(c, y, f"日期 (Date)", "", event_date)
+        
+        y = draw_bilingual_field(c, y, f"事件 (Event)", "", "")
+        y = draw_wrapped_block(c, y, [event_text], font_size=9)
+        
+        y = draw_bilingual_field(c, y, f"影响 (Impact)", "", "")
+        y = draw_wrapped_block(c, y, [event_impact], font_size=9)
+        
+        c.line(MARGIN_LEFT, y, MARGIN_RIGHT, y)
+        y -= 0.5*cm
+
+    draw_footer(c, page_num)
+    c.showPage()
+    page_num += 1
+
+    # ==================================================
+    # ========== 第四页：供应链与建议 ==========
+    # ==================================================
+    y = Y_START
+    
+    if supply_chain_data:
+        y = draw_section_header(c, y, "供应链分析", "Supply Chain Analysis", COLOR_TITLE)
         
         if is_cofco:
-            recommendations_list = [
-                "1. Complete on-site audit of high-risk suppliers (FGV, IOI)",
-                "2. Prepare EUDR compliance documentation package",
-                "3. Communicate supply chain improvement progress to EU/US customers",
-                "4. Increase procurement from low-risk suppliers to >50%"
-            ]
+            suppliers = supply_chain_data.get('upstream', {}).get('suppliers', [])
+            y = draw_wrapped_block(c, y, ["已识别上游高风险供应商 (High-risk upstream suppliers identified):"], FONT_BOLD, 10)
+            
+            for supplier in suppliers[:3]:
+                name = supplier.get('name', 'N/A')
+                status = supplier.get('risk_status', 'N/A')
+                color = set_risk_color(c, status, 100 if '高' in status else 30)
+                y = draw_bilingual_field(c, y, f"• {name}", "", status, value_color=color)
         else:
-            recommendations_list = [
-                "1. Conduct comprehensive supplier ESG audit within 30 days",
-                "2. Engage with downstream customers on ESG improvement plans",
-                "3. Implement real-time monitoring system for high-risk indicators",
-                "4. Obtain third-party certification (RSPO, EUDR compliance)"
-            ]
+            markets = supply_chain_data.get('downstream', {}).get('markets', [])
+            y = draw_wrapped_block(c, y, ["下游市场合规风险 (Downstream Market Compliance Risk):"], FONT_BOLD, 10)
+            y = draw_wrapped_block(c, y, [f"• 主要市场 (Target Markets): {', '.join(markets)}"])
+            y = draw_wrapped_block(c, y, ["• 风险点 (Risk): 欧盟EUDR及美国CBP法规 (EUDR & US CBP Regulations)"])
         
-        c.setFont("Helvetica", 11)
-        for rec in recommendations_list:
-            c.drawString(margin_left + 0.5*cm, y_pos, rec)
-            y_pos -= 0.7*cm
-        
-        y_pos -= 0.5*cm
-        
-        c.setFont("Helvetica-Bold", 12)
-        c.drawString(margin_left, y_pos, "Long-term Strategy:")
-        y_pos -= 0.8*cm
-        
-        c.setFont("Helvetica", 11)
-        c.drawString(margin_left + 0.5*cm, y_pos, "• Establish comprehensive supply chain ESG monitoring system")
-        y_pos -= 0.7*cm
-        c.drawString(margin_left + 0.5*cm, y_pos, "• Diversify supply chain to reduce concentration risk")
-        y_pos -= 0.7*cm
-        c.drawString(margin_left + 0.5*cm, y_pos, "• Increase supply chain transparency and traceability")
-        y_pos -= 0.7*cm
-        c.drawString(margin_left + 0.5*cm, y_pos, "• Obtain GreenLink certification to enhance competitiveness")
+        y -= 1*cm
+
+    # --- 建议措施 ---
+    y = draw_section_header(c, y, "建议措施", "Recommended Actions", COLOR_PRIMARY)
     
-    # 联系信息
-    y_pos -= 1.5*cm
-    c.setFont("Helvetica-Bold", 11)
-    c.drawString(margin_left, y_pos, "For More Information:")
-    y_pos -= 0.6*cm
+    if is_cofco:
+        recs = [
+            "1. 启动对高风险供应商的详细尽职调查。(Conduct due diligence on high-risk suppliers.)",
+            "2. 准备EUDR合规文件，确保上游数据可追溯。(Prepare EUDR documentation, ensure traceability.)",
+            "3. 增加对低风险供应商的采购比例。(Increase procurement from low-risk suppliers.)"
+        ]
+    else:
+        recs = [
+            "1. 立即提交CBP（劳工问题）或EUDR（毁林问题）整改报告。(Submit CBP/EUDR remediation report.)",
+            "2. 实施并披露劳工/环境整改措施。(Implement and disclose remediation actions.)",
+            "3. 建立透明的申诉机制。(Establish a transparent grievance mechanism.)"
+        ]
     
-    c.setFont("Helvetica", 10)
-    c.drawString(margin_left + 0.5*cm, y_pos, "GreenLink ESG Platform")
-    y_pos -= 0.5*cm
-    c.drawString(margin_left + 0.5*cm, y_pos, "Email: support@greenlink.com")
-    y_pos -= 0.5*cm
-    c.drawString(margin_left + 0.5*cm, y_pos, "Website: www.greenlink.com")
+    y = draw_wrapped_block(c, y, recs)
     
-    # 页脚
-    c.setFillColorRGB(0.5, 0.5, 0.5)
-    c.setFont("Helvetica-Oblique", 8)
-    page_num = 5 if 'supply_chain' in data else 4
-    c.drawCentredString(width/2, 2*cm, f"Page {page_num} | Confidential")
-    c.drawCentredString(width/2, 1.5*cm, "End of Report")
+    # --- 报告结尾 ---
+    y -= 2*cm
+    c.setFont(FONT_BOLD, 11)
+    c.setFillColor(COLOR_TITLE)
+    c.drawString(MARGIN_LEFT, y, "联系我们 (Contact Us):")
+    y -= 0.6*cm
     
+    c.setFont(FONT_REG, 10)
+    c.setFillColor(COLOR_TEXT)
+    c.drawString(MARGIN_LEFT + 0.5*cm, y, "绿链 GreenLink ESG 平台")
+    y -= 0.5*cm
+    c.drawString(MARGIN_LEFT + 0.5*cm, y, "邮箱 (Email): support@greenlink.com")
+    y -= 0.5*cm
+    c.drawString(MARGIN_LEFT + 0.5*cm, y, "网站 (Website): www.greenlink.com (Demo)")
+    
+    
+    draw_footer(c, page_num)
+    
+    # --- 保存PDF ---
     c.save()
-    
     buffer.seek(0)
     return buffer
