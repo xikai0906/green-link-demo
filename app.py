@@ -248,9 +248,9 @@ with tab1:
                         with st.expander("📝 详细观察记录"):
                             for obs in observations:
                                 st.write(f"- {obs}")
-                    else:
+             else:
                     # 提示信息可以更具体一点
-                        st.info(f"💡 卫星图片未找到。请确保JSON中的路径 (如: {img_before}) 正确，且文件已上传。")
+                 st.info(f"💡 卫星图片未找到。请确保JSON中的路径 (如: {img_before}) 正确，且文件已上传。")
             # 结论
             conclusion = evidence.get('conclusion', analysis.get('conclusion', ''))
             if conclusion:
