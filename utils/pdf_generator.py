@@ -9,10 +9,11 @@ from reportlab.pdfbase.ttfonts import TTFont
 import os
 
 # --- 1. 定义字体和颜色 ---
+BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 FONT_REGULAR_PATH = os.path.join(BASE_DIR, 'fonts', 'SourceHanSansSC-Regular.otf')
 FONT_BOLD_PATH = os.path.join(BASE_DIR, 'fonts', 'SourceHanSansSC-Bold.otf')
-# =========================================================
 
+# 注册字体
 try:
     # 检查文件是否存在
     if not os.path.exists(FONT_REGULAR_PATH) or not os.path.exists(FONT_BOLD_PATH):
@@ -173,7 +174,7 @@ def draw_footer(c, page_num):
 
 def generate_pdf_report(data):
     """
-    生成ESG合规报告PDF (v2.3 - 双语版)
+    生成ESG合规报告PDF (v2.4 - 双语版)
     """
     buffer = BytesIO()
     c = canvas.Canvas(buffer, pagesize=A4)
