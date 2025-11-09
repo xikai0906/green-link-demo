@@ -1,0 +1,287 @@
+{
+  "company": "IOI集团",
+  "company_english": "IOI Corporation Berhad",
+  "headquarters": "马来西亚 普特拉贾亚",
+  "industry": "棕榈油生产与加工",
+  "stock_code": "MYX: 1961",
+  "plantation_area": "200,000+ 公顷（马来西亚和印尼）",
+  "overview": "IOI集团是全球领先的综合性棕榈油企业，业务涵盖上游种植、中游加工和下游油脂化工。作为RSPO（可持续棕榈油圆桌倡议）的联合创始人，IOI在2016年因毁林争议被暂停认证，随后经历重大整改。",
+  
+  "environment": {
+    "risk_level": "中风险",
+    "risk_score": 55,
+    "analysis": {
+      "method": "Sentinel-2 卫星遥感监测 + Google Earth 历史影像",
+      "period": "2012-2022",
+      "location": "印尼西加里曼丹 PT. Bumi Sawit Sejahtera (BSS) 种植园",
+      "coordinates": "-0.75°S, 110.5°E",
+      "evidence": {
+        "satellite_image_before": "assets/satellite_images/IOI_2012.png",
+        "satellite_image_mid": "assets/satellite_images/IOI_2019.png",
+        "satellite_image_after": "assets/satellite_images/IOI_2022.png",
+        "observation": [
+          "2012年：完整的热带雨林覆盖，深绿色密集森林，自然河流蜿蜒，无人工开发痕迹",
+          "2019年：大规模森林砍伐正在进行，大面积棕色裸露土地，规则的道路网络已建成，年轻棕榈树开始种植（对应2016年RSPO暂停认证时期的毁林证据）",
+          "2022年：完全转变为规则排列的棕榈油种植园，仅左上角保留小块原始森林作为高保护价值区域"
+        ],
+        "conclusion": "IOI在2012-2019年间对PT. BSS区域进行了大规模森林转换，导致2016年RSPO认证暂停。虽然2016年8月恢复认证并承诺零毁林，但历史遗留的环境影响显著。"
+      }
+    },
+    "key_events": [
+      {
+        "year": 2015,
+        "month": 12,
+        "event": "PT. Bumi Sawit Sejahtera发生火灾，破坏高保护价值(HCV)区域，摧毁泥炭森林和猩猩、懒熊、长鼻猴等濒危物种栖息地",
+        "impact": "严重",
+        "source": "Forests & Finance"
+      },
+      {
+        "year": 2016,
+        "month": 3,
+        "event": "NGO AidEnvironment向RSPO提交正式投诉，指控IOI在加里曼丹砍伐高保护价值森林和开发泥炭地",
+        "impact": "严重",
+        "source": "Greenpeace"
+      },
+      {
+        "year": 2016,
+        "month": 4,
+        "event": "RSPO暂停IOI所有认证，理由是在印尼非法开发泥炭地和毁林",
+        "impact": "严重",
+        "source": "RSPO官网"
+      },
+      {
+        "year": 2016,
+        "month": 8,
+        "event": "IOI经过整改后，RSPO恢复其认证资格",
+        "impact": "正面",
+        "source": "RSPO官网"
+      },
+      {
+        "year": 2019,
+        "month": 4,
+        "event": "IOI与Aidenvironment合作，启动基于卫星图像的供应链近实时毁林监测系统",
+        "impact": "正面",
+        "source": "IOI可持续发展报告"
+      },
+      {
+        "year": 2023,
+        "month": null,
+        "event": "IOI报告3起火灾发生在公司种植园内，37起火灾发生在种植园外围区域",
+        "impact": "中等",
+        "source": "SPOTT数据库"
+      }
+    ],
+    "certifications": {
+      "RSPO": {
+        "status": "已认证",
+        "certified_area_percentage": "97%+",
+        "suspension_period": "2016年4月 - 2016年8月",
+        "notes": "IOI是RSPO联合创始成员，2016年因毁林被暂停认证5个月"
+      },
+      "zero_deforestation_commitment": {
+        "announced": "2016年",
+        "target_year": "立即生效",
+        "cutoff_date": "2016年11月",
+        "definition": "不开发高碳储量(HCS)森林和高保护价值(HCV)区域"
+      }
+    },
+    "carbon_emissions": {
+      "scope_1_2_intensity": "1.703 tCO2e/吨产品 (2023)",
+      "reduction_target": "到2025年相比2015年基线减少40%",
+      "net_zero_target": "2040年"
+    }
+  },
+
+  "social": {
+    "risk_level": "高风险",
+    "risk_score": 75,
+    "key_events": [
+      {
+        "year": 2014,
+        "month": null,
+        "event": "Finnwatch对IOI马来西亚柔佛州种植园进行实地调查，发现一系列人权和劳工问题，包括强迫劳动指标",
+        "impact": "严重",
+        "details": [
+          "没收工人护照",
+          "使用工人不熟悉的语言签订合同",
+          "限制结社自由",
+          "工资低于最低标准"
+        ]
+      },
+      {
+        "year": 2016,
+        "month": 3,
+        "event": "RSPO暂停IOI认证后，主要客户取消采购合同",
+        "impact": "严重",
+        "affected_customers": [
+          "Unilever（联合利华）",
+          "Mars（玛氏）",
+          "Kellogg's（家乐氏）",
+          "Nestlé（雀巢）",
+          "Hershey's（好时）",
+          "Mondelez（亿滋）",
+          "General Mills（通用磨坊）",
+          "Bunge（邦吉）",
+          "Cargill（嘉吉）"
+        ]
+      },
+      {
+        "year": 2017,
+        "month": 1,
+        "event": "砂拉越Long Teran Kanan原住民社区拒绝IOI的土地争议和解提议",
+        "impact": "中等",
+        "details": "IOI-Pelita合资企业与当地社区存在长期土地冲突"
+      },
+      {
+        "year": 2021,
+        "month": 6,
+        "day": 1,
+        "event": "Finnwatch发布报告揭露IOI种植园严重的劳工问题",
+        "impact": "严重",
+        "details": [
+          "工人支付高额招聘费（强迫劳动指标）",
+          "工资低于最低标准",
+          "生活条件恶劣",
+          "经理打骂工人"
+        ],
+        "source": "www.finnwatch.org"
+      },
+      {
+        "year": 2021,
+        "month": 6,
+        "day": 29,
+        "event": "美国海关和边境保护局(CBP)对IOI的强迫劳动指控展开调查",
+        "impact": "严重",
+        "details": "调查可能导致IOI产品被禁止进入美国市场",
+        "source": "Reuters (www.reuters.com)"
+      }
+    ],
+    "improvement_actions": [
+      {
+        "year": 2017,
+        "action": "委托Business for Social Responsibility (BSR)外部顾问验证沙巴州种植园的劳工问题整改进度"
+      },
+      {
+        "year": 2017,
+        "action": "承诺终止招聘费用制度，解决Finnwatch报告中指出的马来西亚半岛种植园劳工问题"
+      },
+      {
+        "year": 2018,
+        "action": "承诺进行独立第三方验证，评估可持续棕榈油政策的实施情况"
+      }
+    ],
+    "labor_standards": {
+      "commitment": "符合国际劳工组织(ILO)核心公约",
+      "grievance_mechanism": "已建立申诉机制",
+      "worker_welfare": "正在改善住宿条件和工资标准"
+    }
+  },
+
+  "traditional_esg_rating": {
+    "provider": "MSCI / Sustainalytics",
+    "rating": "BB - BBB 级别（估计）",
+    "limitations": [
+      "传统评级无法区分环境(E)和社会(S)风险来源",
+      "年度更新频率慢，无法及时反映突发事件（如2016年RSPO暂停）",
+      "订阅费用高昂，中小企业难以获取",
+      "评分方法不透明，缺乏客观验证"
+    ]
+  },
+
+  "greenlink_advantage": {
+    "environment_score": 55,
+    "social_score": 75,
+    "differentiation": [
+      "环境(E)：基于卫星遥感客观验证，清晰展示2012-2022年森林转换过程，虽有历史毁林但已承诺零毁林并建立监测系统",
+      "社会(S)：基于公开舆情和NGO报告精准定位劳工问题和强迫劳动风险，美国CBP调查证明高风险",
+      "传统评级给出模糊的BB-BBB级别，无法区分E和S风险；绿链明确指出：环境风险中等（已整改），社会风险高（持续监控）"
+    ],
+    "cost_efficiency": "基于免费公开数据（Sentinel-2卫星、新闻舆情），成本降低90%，周度更新"
+  },
+
+  "supply_chain": {
+    "upstream": {
+      "description": "IOI自有种植园占98.98%，外部供应商占1.02%",
+      "locations": [
+        "马来西亚：Sabah（沙巴）、Sarawak（砂拉越）、Johor（柔佛）、Pahang（彭亨）、Malacca（马六甲）、Negeri Sembilan（森美兰）",
+        "印尼：West Kalimantan（西加里曼丹）、Central Kalimantan（中加里曼丹）"
+      ],
+      "subsidiaries": [
+        "PT. Bumi Sawit Sejahtera (BSS) - 西加里曼丹",
+        "PT. Kalimantan Prima Agro Mandiri (KPAM) - 中加里曼丹",
+        "Bumitama Gunajaya Agro（IOI持股32.1%）"
+      ],
+      "traceability": "97.45% 棕榈油可追溯至种植园，91.83% 棕榈仁可追溯至种植园（2023年数据）"
+    },
+    "midstream": {
+      "description": "IOI拥有完整的中游加工能力",
+      "facilities": [
+        "15座棕榈油加工厂（马来西亚和印尼）",
+        "2座精炼厂（马来西亚），年产能180万吨",
+        "4座油脂化工厂（马来西亚3座 + 德国1座）",
+        "IOI Edible Oils（食用油）",
+        "IOI Oleochemical（油脂化工）"
+      ]
+    },
+    "downstream": {
+      "description": "IOI产品出口至全球70+个国家",
+      "major_customers": [
+        "Unilever（联合利华）- 2016年曾暂停采购，后恢复",
+        "Mars（玛氏）",
+        "Nestlé（雀巢）",
+        "Procter & Gamble (P&G)（宝洁）",
+        "Kellogg's（家乐氏）"
+      ],
+      "products": [
+        "食用油脂",
+        "特种油脂",
+        "油脂化工品（肥皂、洗涤剂、化妆品原料）"
+      ],
+      "partner": "Bunge Loders Croklaan（IOI持股20%，专注特种油脂）"
+    },
+    "risk_transmission": {
+      "description": "供应链风险传导路径清晰可见",
+      "pathway": [
+        "上游：种植园毁林 + 劳工问题 → 2016年RSPO暂停认证",
+        "中游：认证暂停 → 精炼厂和加工厂面临合规危机",
+        "下游：下游品牌客户（Unilever、Mars等）取消采购合同 → 营收大幅下降",
+        "市场压力 → IOI被迫整改 → 2016年8月恢复认证 → 客户逐步恢复采购"
+      ]
+    }
+  },
+
+  "b2b_value": {
+    "for_buyers": [
+      "实时风险预警：基于卫星监测和舆情分析，周度更新供应商风险状态",
+      "合规报告：符合欧盟EUDR法规、美国CBP强迫劳动禁令的尽职调查要求",
+      "成本节约：无需订阅昂贵的传统ESG评级，基于公开数据的透明评估"
+    ],
+    "for_investors": [
+      "精准识别E/S风险分离：IOI的环境风险已改善（中风险），但社会风险持续存在（高风险）",
+      "监控整改进度：跟踪IOI的劳工问题整改和美国CBP调查结果",
+      "投资决策支持：避免因模糊ESG评级导致的投资误判"
+    ]
+  },
+
+  "b2c_value": {
+    "consumer_trust_label": "绿链ESG认证标签",
+    "qr_code_traceability": "扫描产品二维码，查看完整供应链透明度报告",
+    "messaging": "您购买的产品来自IOI集团供应链。IOI已通过RSPO认证，并承诺零毁林。但请注意：该公司在劳工权益方面仍存在改善空间（美国CBP调查进行中）。"
+  },
+
+  "data_sources": [
+    "Sentinel-2卫星遥感数据（2012-2022）",
+    "Google Earth历史影像",
+    "RSPO官方认证记录",
+    "Greenpeace调查报告",
+    "Finnwatch劳工权益报告",
+    "Reuters新闻报道",
+    "SPOTT（Sustainability Policy Transparency Toolkit）数据库",
+    "IOI集团可持续发展报告（2019-2023）",
+    "Global Forest Watch",
+    "Forests & Finance数据库"
+  ],
+
+  "last_updated": "2024-11-09",
+  "report_validity": "本报告基于截至2024年11月的公开数据，建议每季度更新"
+}
