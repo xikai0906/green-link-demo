@@ -236,21 +236,23 @@ with tab1:
             img_after_path = os.path.join(BASE_DIR, img_after) if img_after else ''
                 
             # 使用绝对路径进行检查和显示
-            if img_before_path and img_after_path and os.path.exists(img_before_path):
-                col_img1, col_img2 = st.columns(2)
-                with col_img1:
-                    st.image(img_before_path, caption="基准年", use_column_width=True)
-                with col_img2:
-                    st.image(img_after_path, caption="最近年", use_column_width=True)
-             # 显示观察结果（IOI特有）
-                    observations = evidence.get('observation', [])
-                    if observations:
-                        with st.expander("📝 详细观察记录"):
-                            for obs in observations:
-                                st.write(f"- {obs}")
-             else:
-                    # 提示信息可以更具体一点
-                 st.info(f"💡 卫星图片未找到。请确保JSON中的路径 (如: {img_before}) 正确，且文件已上传。")
+        if img_before_path and img_after_path and os.path.exists(img_before_path):
+            col_img1, col_img2 = st.columns(2)
+            with col_img1:
+                st.image(img_before_path, caption="基准年", use_column_width=True)
+            with col_img2:
+                st.image(img_after_path, caption="最近年", use_column_width=True)
+            
+            # 显示观察结果（IOI特有）—— 这是一个独立逻辑
+            observations = evidence.get('observation', [])
+            if observations:
+                with st.expander("📝 详细观察记录"):
+                    for obs in observations:
+                        st.write(f"- {obs}")
+        
+        else: # <-- 关键：这个 else 应该在这里，与 if os.path.exists 对齐
+            # 提示信息可以更具体一点
+            st.info(f"💡 卫星图片未找到。请确保JSON中的路径 (如: {img_before}) 正确，且文件已上传。")
             # 结论
             conclusion = evidence.get('conclusion', analysis.get('conclusion', ''))
             if conclusion:
