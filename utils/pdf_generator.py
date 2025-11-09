@@ -1,11 +1,3 @@
-"""
-PDF报告生成模块 (v2.1 - 修复字体路径)
-- 支持中英双语
-- 匹配App配色方案
-- 优化布局和可读性
-- 修正字体文件扩展名为 .otf
-"""
-
 from io import BytesIO
 from datetime import datetime
 from reportlab.lib.pagesizes import A4
@@ -17,23 +9,35 @@ from reportlab.pdfbase.ttfonts import TTFont
 import os
 
 # --- 1. 定义字体和颜色 ---
+FONT_REGULAR_PATH = os.path.join(BASE_DIR, 'fonts', 'SourceHanSansSC-Regular.otf')
+FONT_BOLD_PATH = os.path.join(BASE_DIR, 'fonts', 'SourceHanSansSC-Bold.otf')
+# =========================================================
 
-# 假设字体文件在项目根目录的 'fonts' 文件夹中
-BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-# ========== 修复：从 .ttf 修改为 .otf ==========
-FONT_REGULAR_PATH = os.path.join(BASE_DIR, 'fonts', 'SourceHanSansCN-Regular.otf')
-FONT_BOLD_PATH = os.path.join(BASE_DIR, 'fonts', 'SourceHanSansCN-Bold.otf')
-# ===============================================
-
-# 注册字体
 try:
+    # 检查文件是否存在
+    if not os.path.exists(FONT_REGULAR_PATH) or not os.path.exists(FONT_BOLD_PATH):
+        print("="*50)
+        print("!!! 字体文件未找到 (Font file not found) !!!")
+        print(f"!!! 正在寻找 (Looking for): {FONT_REGULAR_PATH}")
+        print(f"!!! 实际文件是否存在? (Exists?): {os.path.exists(FONT_REGULAR_PATH)}")
+        print(f"!!! 正在寻找 (Looking for): {FONT_BOLD_PATH}")
+        print(f"!!! 实际文件是否存在? (Exists?): {os.path.exists(FONT_BOLD_PATH)}")
+        print("!!! 请确保 'fonts' 文件夹在根目录, 且文件名完全正确。")
+        print("="*50)
+        raise FileNotFoundError("字体文件未在指定路径找到。")
+        
     pdfmetrics.registerFont(TTFont('SourceHanSans-Regular', FONT_REGULAR_PATH))
     pdfmetrics.registerFont(TTFont('SourceHanSans-Bold', FONT_BOLD_PATH))
     FONT_REG = "SourceHanSans-Regular"
     FONT_BOLD = "SourceHanSans-Bold"
+    print(">>> 成功：中文字体加载成功! (Chinese fonts loaded successfully!)")
+    
 except Exception as e:
-    print(f"警告：中文字体加载失败。PDF将回退到英文字体。错误: {e}")
-    print(f"请确保 '{FONT_REGULAR_PATH}' 存在。")
+    print("="*50)
+    print("!!! 警告：中文字体加载失败! (WARNING: Chinese font loading FAILED!)")
+    print(f"!!! 错误详情 (Error): {e}")
+    print("!!! PDF将回退到英文字体 (Helvetica)，中文将显示为乱码 '■■■'。")
+    print("="*50)
     FONT_REG = "Helvetica"
     FONT_BOLD = "Helvetica-Bold"
 
@@ -58,6 +62,7 @@ def draw_section_header(c, y, cn_title, en_title, color):
     """绘制一个双语组标题"""
     if y < 6 * cm: # 检查分页
         c.showPage()
+        draw_footer(c, c.getPageNumber()) # 绘制上一页的页脚
         y = Y_START
     
     c.setFont(FONT_BOLD, 14)
@@ -78,6 +83,7 @@ def draw_bilingual_field(c, y, cn_label, en_label, value_text, value_color=COLOR
     """绘制一个双语标签和对应的值"""
     if y < 4 * cm: # 检查分页
         c.showPage()
+        draw_footer(c, c.getPageNumber())
         y = Y_START
     
     c.setFont(FONT_BOLD, 10)
@@ -94,7 +100,15 @@ def draw_bilingual_field(c, y, cn_label, en_label, value_text, value_color=COLOR
     # 简单的值换行
     max_width = 12 * cm
     line = ""
-    for char in str(value_text):
+    start_y = y
+    
+    # 检查值是否是列表或元组
+    if isinstance(value_text, (list, tuple)):
+        value_str = ", ".join(value_text)
+    else:
+        value_str = str(value_text)
+        
+    for char in value_str:
         if c.stringWidth(line + char, FONT_REG, 10) > max_width:
             c.drawString(MARGIN_LEFT + 5.5*cm, y, line)
             y -= 0.5*cm
@@ -103,7 +117,8 @@ def draw_bilingual_field(c, y, cn_label, en_label, value_text, value_color=COLOR
             line += char
     c.drawString(MARGIN_LEFT + 5.5*cm, y, line)
     
-    return y - 0.8*cm # 返回新的Y坐标
+    # 返回最低的Y坐标，确保有足够的间距
+    return min(y - 0.8*cm, start_y - 0.8*cm)
 
 def draw_wrapped_block(c, y, text_list, font_name=FONT_REG, font_size=10):
     """绘制一个换行的文本块 (用于结论或事件描述)"""
@@ -114,31 +129,33 @@ def draw_wrapped_block(c, y, text_list, font_name=FONT_REG, font_size=10):
     for item in text_list:
         if y < 4 * cm:
             c.showPage()
+            draw_footer(c, c.getPageNumber())
             y = Y_START
             
         # 假设 item 是一个字符串
-        words = str(item).split() if " " in str(item) else list(str(item)) # 简单的中/英分词
+        # 改进中英文换行逻辑
+        item_str = str(item)
         line = ""
-        for word in words:
-            word_to_add = word + (" " if " " in str(item) else "")
-            if c.stringWidth(line + word_to_add, font_name, font_size) > max_width:
+        for char in item_str:
+            if c.stringWidth(line + char, font_name, font_size) > max_width:
                 c.drawString(MARGIN_LEFT + 1*cm, y, line)
-                y -= 0.5*cm
-                line = word_to_add
+                y -= (font_size * 1.2) / 72 * cm # 1.2倍行距
+                line = char
             else:
-                line += word_to_add
+                line += char
         
         c.drawString(MARGIN_LEFT + 1*cm, y, line)
-        y -= 0.6*cm
+        y -= (font_size * 1.4) / 72 * cm # 增加项目间距
         
     return y
 
 def set_risk_color(c, level, score):
     """根据风险级别设置颜色"""
-    if "低" in level or "Low" in level or score < 40:
+    level_str = str(level).lower()
+    if "低" in level_str or "low" in level_str or score < 40:
         c.setFillColor(RISK_LOW)
         return RISK_LOW
-    elif "中" in level or "Medium" in level or score < 70:
+    elif "中" in level_str or "medium" in level_str or score < 70:
         c.setFillColor(RISK_MEDIUM)
         return RISK_MEDIUM
     else:
@@ -156,7 +173,7 @@ def draw_footer(c, page_num):
 
 def generate_pdf_report(data):
     """
-    生成ESG合规报告PDF (v2.1 - 双语版)
+    生成ESG合规报告PDF (v2.3 - 双语版)
     """
     buffer = BytesIO()
     c = canvas.Canvas(buffer, pagesize=A4)
@@ -323,6 +340,8 @@ def generate_pdf_report(data):
     for event in key_events[:4]: # 最多显示4个
         if y < 8 * cm:
             c.showPage()
+            draw_footer(c, page_num)
+            page_num += 1
             y = Y_START
             y = draw_section_header(c, y, "社会风险分析 (S) - 续", "Social Risk Analysis (S) - Cont.", RISK_HIGH)
             c.setFont(FONT_BOLD, 10)
