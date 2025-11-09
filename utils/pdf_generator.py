@@ -1,8 +1,9 @@
 """
-PDF报告生成模块 (v2 - 双语版)
+PDF报告生成模块 (v2.1 - 修复字体路径)
 - 支持中英双语
 - 匹配App配色方案
 - 优化布局和可读性
+- 修正字体文件扩展名为 .otf
 """
 
 from io import BytesIO
@@ -19,8 +20,10 @@ import os
 
 # 假设字体文件在项目根目录的 'fonts' 文件夹中
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-FONT_REGULAR_PATH = os.path.join(BASE_DIR, 'fonts', 'SourceHanSansCN-Regular.ttf')
-FONT_BOLD_PATH = os.path.join(BASE_DIR, 'fonts', 'SourceHanSansCN-Bold.ttf')
+# ========== 修复：从 .ttf 修改为 .otf ==========
+FONT_REGULAR_PATH = os.path.join(BASE_DIR, 'fonts', 'SourceHanSansCN-Regular.otf')
+FONT_BOLD_PATH = os.path.join(BASE_DIR, 'fonts', 'SourceHanSansCN-Bold.otf')
+# ===============================================
 
 # 注册字体
 try:
@@ -153,7 +156,7 @@ def draw_footer(c, page_num):
 
 def generate_pdf_report(data):
     """
-    生成ESG合规报告PDF (v2 - 双语版)
+    生成ESG合规报告PDF (v2.1 - 双语版)
     """
     buffer = BytesIO()
     c = canvas.Canvas(buffer, pagesize=A4)
