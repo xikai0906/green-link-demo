@@ -257,7 +257,7 @@ with tab1:
             conclusion = evidence.get('conclusion', analysis.get('conclusion', ''))
             if conclusion:
                 st.success(f"✅ **结论**: {conclusion}")
-        else:
+            else:
             # COFCO的环境表现
             positive_actions = env.get('positive_actions', [])
             if positive_actions:
