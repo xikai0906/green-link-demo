@@ -6,6 +6,7 @@ import json
 import pandas as pd
 from PIL import Image
 import os
+BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 
 # 页面配置
 st.set_page_config(
@@ -95,7 +96,7 @@ st.sidebar.info(f"**供应链位置**: {company_info['type']}\n\n**角色**: {co
 # 加载数据
 @st.cache_data
 def load_data(filename):
-    file_path = f'data/{filename}'
+    file_path = os.path.join(BASE_DIR, 'data', filename)
     if not os.path.exists(file_path):
         st.warning(f"数据文件 {filename} 未找到，显示示例数据")
         return get_sample_data(), False
