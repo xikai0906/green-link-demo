@@ -898,4 +898,5 @@ st.sidebar.info("""
 """)
 
 st.sidebar.markdown("---")
-st.sidebar.caption("© 2024 GreenLink | 创新创业大赛DEMO")
+st.sidebar.caption("© 2025 GreenLink | 创新创业大赛DEMO")
+st.sidebar.caption("ysuy5756@gmail.com | RIELY | GXUFE")
