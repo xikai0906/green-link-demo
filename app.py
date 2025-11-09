@@ -20,13 +20,15 @@ st.set_page_config(
 st.markdown("""
 <style>
     .main-header {
-        font-size: 6.5rem;
+        font-size: 5.5rem;
+        font-weight: 700;
         color: #2c3e50;
         text-align: center;
         margin-bottom: 1rem;
     }
     .sub-header {
-        font-size: 4.5rem;
+        font-size: 2.5rem;
+        font-weight: 400;
         color: #7f8c8d;
         text-align: center;
         margin-bottom: 2rem;
