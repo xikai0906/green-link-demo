@@ -9,57 +9,84 @@ import os
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 
 # 页面配置
-st.set_page_config(
-    page_title="绿链 GreenLink - ESG风险评估平台",
-    page_icon="🌿",
-    layout="wide",
-    initial_sidebar_state="expanded"
-)
-
-# 自定义CSS样式
 st.markdown("""
 <style>
+    .esg-stripe {
+        height: 8px;
+        background: linear-gradient(90deg, 
+            #27ae60 0% 33%,      /* 绿色 - Environment */
+            #3498db 33% 66%,     /* 蓝色 - Social */
+            #f39c12 66% 100%     /* 金色 - Governance */
+        );
+        margin-bottom: 30px;
+        border-radius: 4px;
+    }
+    
+    .header-container {
+        background: linear-gradient(135deg, 
+            rgba(39,174,96,0.1) 0%,
+            rgba(52,152,219,0.05) 50%,
+            rgba(243,156,18,0.05) 100%
+        );
+        padding: 40px 20px;
+        border-radius: 20px;
+        border: 2px solid rgba(39,174,96,0.3);
+        text-align: center;
+        margin-bottom: 30px;
+        position: relative;
+    }
+    
     .main-header {
-        font-size: 155rem;
-        font-weight: 700;
-        color: #2c3e50;
-        text-align: center;
-        margin-bottom: 1rem;
+        font-size: 3.2rem;
+        font-weight: 800;
+        background: linear-gradient(135deg, #27ae60 0%, #229954 50%, #16a085 100%);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        letter-spacing: 4px;
     }
+    
     .sub-header {
-        font-size: 122rem;
-        font-weight: 400;
-        color: #7f8c8d;
-        text-align: center;
-        margin-bottom: 2rem;
+        font-size: 1.2rem;
+        color: #2c3e50;
+        letter-spacing: 1.5px;
+        margin-bottom: 20px;
     }
-    .metric-card {
-        background-color: #f8f9fa;
-        padding: 1.5rem;
-        border-radius: 10px;
-        border-left: 5px solid #27ae60;
+    
+    .esg-badges {
+        display: flex;
+        justify-content: center;
+        gap: 15px;
+        margin-top: 20px;
+        flex-wrap: wrap;
     }
-    .risk-high {
-        color: #e74c3c;
-        font-weight: bold;
-    }
-    .risk-low {
-        color: #27ae60;
-        font-weight: bold;
-    }
-    .supply-chain-box {
-        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-        padding: 15px;
-        border-radius: 10px;
+    
+    .esg-badge {
+        padding: 8px 20px;
+        border-radius: 25px;
+        font-size: 0.9rem;
+        font-weight: 600;
         color: white;
-        text-align: center;
-        margin: 10px 0;
+        box-shadow: 0 4px 15px rgba(0,0,0,0.1);
     }
+    
+    .badge-e { background: linear-gradient(135deg, #27ae60, #2ecc71); }
+    .badge-s { background: linear-gradient(135deg, #3498db, #5dade2); }
+    .badge-g { background: linear-gradient(135deg, #f39c12, #f5b041); }
 </style>
 """, unsafe_allow_html=True)
 
-# 标题
-st.markdown('<p class="main-header">🌿 绿链 GreenLink</p>', unsafe_allow_html=True)
+st.markdown("""
+<div class="esg-stripe"></div>
+<div class="header-container">
+    <p class="main-header">绿链 GREENLINK</p>
+    <p class="sub-header">基于另类数据的供应链ESG风险评估平台</p>
+    <div class="esg-badges">
+        <span class="esg-badge badge-e">🌍 环境 Environment</span>
+        <span class="esg-badge badge-s">👥 社会 Social</span>
+        <span class="esg-badge badge-g">⚖️ 治理 Governance</span>
+    </div>
+</div>
+""", unsafe_allow_html=True)
 st.markdown('<p class="sub-header">基于另类数据的供应链ESG风险评估平台</p>', unsafe_allow_html=True)
 
 # 侧边栏：选择公司
