@@ -8,123 +8,166 @@ from reportlab.pdfbase import pdfmetrics
 from reportlab.pdfbase.ttfonts import TTFont
 import os
 
-
+# ============================================================
+# 字体配置
+# ============================================================
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-
-FONT_REGULAR_NAME = 'AlibabaPuHuiTi-3-55-Regular.ttf'
-FONT_BOLD_NAME = 'AlibabaPuHuiTi-3-85-Bold.ttf'
-
-FONT_REGULAR_PATH = os.path.join(BASE_DIR, 'fonts', FONT_REGULAR_NAME)
-FONT_BOLD_PATH = os.path.join(BASE_DIR, 'fonts', FONT_BOLD_NAME)
+FONT_DIR = os.path.join(BASE_DIR, 'fonts')
 
 FONT_REG = None
 FONT_BOLD = None
-FONT_LOADED = False
 
 try:
-    if os.path.exists(FONT_REGULAR_PATH) and os.path.exists(FONT_BOLD_PATH):
-        pdfmetrics.registerFont(TTFont('AlibabaPuHuiTi-Regular', FONT_REGULAR_PATH))
-        pdfmetrics.registerFont(TTFont('AlibabaPuHuiTi-Bold', FONT_BOLD_PATH))
-        FONT_REG = "AlibabaPuHuiTi-Regular"
-        FONT_BOLD = "AlibabaPuHuiTi-Bold"
-        FONT_LOADED = True
-        print("✓ 字体加载成功")
+    regular_path = os.path.join(FONT_DIR, 'AlibabaPuHuiTi-3-55-Regular.ttf')
+    bold_path = os.path.join(FONT_DIR, 'AlibabaPuHuiTi-3-85-Bold.ttf')
+    
+    if os.path.exists(regular_path) and os.path.exists(bold_path):
+        pdfmetrics.registerFont(TTFont('PuHuiTi-Regular', regular_path))
+        pdfmetrics.registerFont(TTFont('PuHuiTi-Bold', bold_path))
+        FONT_REG = "PuHuiTi-Regular"
+        FONT_BOLD = "PuHuiTi-Bold"
+        print("✓ 阿里巴巴普惠体加载成功")
     else:
-        raise FileNotFoundError("字体文件未找到")
+        raise FileNotFoundError("字体文件不存在")
 except Exception as e:
-    print(f"✗ 字体加载失败: {e}")
+    print(f"⚠ 使用英文字体: {e}")
     FONT_REG = "Helvetica"
     FONT_BOLD = "Helvetica-Bold"
 
 # ============================================================
-# 颜色配置
+# 配色方案
 # ============================================================
-COLOR_PRIMARY = HexColor("#27ae60")
-COLOR_TITLE = HexColor("#2c3e50")
-COLOR_TEXT = HexColor("#333333")
-COLOR_SUBTLE = HexColor("#7f8c8d")
-RISK_LOW = HexColor("#27ae60")
-RISK_MEDIUM = HexColor("#f39c12")
-RISK_HIGH = HexColor("#e74c3c")
+COLOR_PRIMARY = HexColor("#27ae60")      # 主色
+COLOR_TITLE = HexColor("#2c3e50")        # 标题
+COLOR_TEXT = HexColor("#333333")         # 正文
+COLOR_SUBTLE = HexColor("#7f8c8d")       # 次要
+RISK_LOW = HexColor("#27ae60")           # 低风险
+RISK_MEDIUM = HexColor("#f39c12")        # 中风险
+RISK_HIGH = HexColor("#e74c3c")          # 高风险
 
+# ============================================================
+# 页面布局
+# ============================================================
 WIDTH, HEIGHT = A4
 MARGIN_LEFT = 2 * cm
 MARGIN_RIGHT = WIDTH - 2 * cm
 Y_START = HEIGHT - 2.5 * cm
 
 # ============================================================
-# 核心绘图函数 - 完全重写
+# 【核心函数】正确处理项目符号的文本绘制
 # ============================================================
 
-def draw_text_with_bullet(c, x, y, text, font_name, font_size, max_width):
+def draw_text_line(c, x, y, text, font_name, font_size, max_width):
     """
-    专门处理带项目符号的文本绘制
-    返回绘制后的新Y坐标
+    绘制单行或多行文本，正确处理项目符号
+    
+    关键修复:
+    1. 检测项目符号 (•, 1., 2., etc.)
+    2. 分离符号和内容
+    3. 符号画在 x 位置
+    4. 内容画在 x + offset 位置
+    5. 换行保持相同缩进
+    
+    Args:
+        c: Canvas对象
+        x: X坐标
+        y: Y坐标
+        text: 文本内容
+        font_name: 字体名称
+        font_size: 字体大小
+        max_width: 最大宽度
+        
+    Returns:
+        新的Y坐标
     """
     c.setFont(font_name, font_size)
     
-    # 检测并分离项目符号
+    # 1. 识别项目符号类型
     bullet = None
     content = text
+    bullet_offset = 0.7 * cm  # 符号与文本的间距
     
+    # 检测 "• " 或 "•"
     if text.startswith("• "):
         bullet = "•"
         content = text[2:]  # 去掉 "• "
     elif text.startswith("•"):
         bullet = "•"
-        content = text[1:].lstrip()  # 去掉 "•" 和空格
+        # 去掉所有前导的 "•" 和空格
+        content = text.lstrip("•").lstrip()
     
+    # 检测数字列表 "1. ", "2. "
+    elif text and len(text) > 2 and text[0].isdigit():
+        for i in range(min(3, len(text))):
+            if text[i] == '.':
+                bullet = text[:i+1]  # "1.", "2.", etc.
+                content = text[i+1:].lstrip()
+                bullet_offset = c.stringWidth(bullet + " ", font_name, font_size)
+                break
+    
+    # 2. 绘制项目符号（如果有）
     if bullet:
-        # 绘制项目符号
+        # 画符号
         c.drawString(x, y, bullet)
         
-        # 文本从符号右侧开始
-        text_x = x + 0.6*cm
-        available_width = max_width - 0.6*cm
+        # 计算文本起始位置
+        text_x = x + bullet_offset
+        text_max_width = max_width - bullet_offset
         
-        # 逐字符处理换行
-        words = []
+        # 3. 处理文本换行
+        lines = []
         current_line = ""
         
         for char in content:
             test_line = current_line + char
-            if c.stringWidth(test_line, font_name, font_size) > available_width:
+            char_width = c.stringWidth(test_line, font_name, font_size)
+            
+            if char_width > text_max_width:
                 if current_line:
-                    words.append(current_line)
+                    lines.append(current_line)
                 current_line = char
             else:
                 current_line = test_line
         
+        # 添加最后一行
         if current_line:
-            words.append(current_line)
+            lines.append(current_line)
         
-        # 绘制所有行
-        for line in words:
+        # 4. 绘制所有行（保持相同缩进）
+        for line in lines:
             c.drawString(text_x, y, line)
-            y -= (font_size * 1.3) / 72 * cm
+            y -= (font_size * 1.4) / 72 * cm  # 行距
         
-        return y
+        return y - 0.2*cm  # 项目间距
     
     else:
-        # 普通文本（无项目符号）
+        # 无项目符号的普通文本
+        lines = []
         current_line = ""
         
         for char in content:
             test_line = current_line + char
+            
             if c.stringWidth(test_line, font_name, font_size) > max_width:
                 if current_line:
-                    c.drawString(x, y, current_line)
-                    y -= (font_size * 1.3) / 72 * cm
+                    lines.append(current_line)
                 current_line = char
             else:
                 current_line = test_line
         
         if current_line:
-            c.drawString(x, y, current_line)
-            y -= (font_size * 1.3) / 72 * cm
+            lines.append(current_line)
         
-        return y
+        for line in lines:
+            c.drawString(x, y, line)
+            y -= (font_size * 1.4) / 72 * cm
+        
+        return y - 0.2*cm
 
+
+# ============================================================
+# 其他辅助函数
+# ============================================================
 
 def draw_section_header(c, y, cn_title, en_title, color):
     """绘制章节标题"""
@@ -163,7 +206,6 @@ def draw_bilingual_field(c, y, cn_label, en_label, value_text, value_color=COLOR
     c.setFillColor(COLOR_SUBTLE)
     c.drawString(MARGIN_LEFT + 0.5*cm, y - 0.4*cm, en_label)
     
-    c.setFont(FONT_REG, 10)
     c.setFillColor(value_color)
     
     if isinstance(value_text, (list, tuple)):
@@ -171,17 +213,14 @@ def draw_bilingual_field(c, y, cn_label, en_label, value_text, value_color=COLOR
     else:
         value_str = str(value_text)
     
-    # 使用新的文本绘制函数
     max_width = 12 * cm
-    y = draw_text_with_bullet(c, MARGIN_LEFT + 5.5*cm, y, value_str, FONT_REG, 10, max_width)
+    y = draw_text_line(c, MARGIN_LEFT + 5.5*cm, y, value_str, FONT_REG, 10, max_width)
     
     return y - 0.3*cm
 
 
-def draw_wrapped_block(c, y, text_list, font_name=None, font_size=10):
-    """
-    绘制文本块 - 使用新的渲染逻辑
-    """
+def draw_text_block(c, y, text_list, font_name=None, font_size=10):
+    """绘制文本块"""
     if font_name is None:
         font_name = FONT_REG
     
@@ -196,15 +235,13 @@ def draw_wrapped_block(c, y, text_list, font_name=None, font_size=10):
             draw_footer(c, c.getPageNumber())
             y = Y_START
         
-        # 使用新的文本绘制函数
-        y = draw_text_with_bullet(c, base_x, y, str(text), font_name, font_size, max_width)
-        y -= 0.3*cm  # 项目间距
+        y = draw_text_line(c, base_x, y, str(text), font_name, font_size, max_width)
     
     return y
 
 
 def set_risk_color(c, level, score):
-    """设置风险颜色"""
+    """根据风险等级设置颜色"""
     level_str = str(level).lower()
     
     if "低" in level_str or "low" in level_str or score < 40:
@@ -229,11 +266,23 @@ def draw_footer(c, page_num):
 
 
 # ============================================================
-# 主生成函数
+# 主函数
 # ============================================================
 
 def generate_pdf_report(data):
-    """生成ESG报告PDF"""
+    """
+    生成ESG合规报告PDF
+    
+    Args:
+        data: ESG数据字典，包含:
+            - company: 公司名称
+            - environment: 环境数据
+            - social: 社会数据
+            - supply_chain: 供应链数据
+    
+    Returns:
+        BytesIO: PDF文件流
+    """
     buffer = BytesIO()
     c = canvas.Canvas(buffer, pagesize=A4)
     c.setTitle(f"{data.get('company', 'Report')} - ESG Report")
@@ -271,19 +320,15 @@ def generate_pdf_report(data):
     y -= 0.6*cm
     
     if is_cofco:
-        company_type_cn = "中游加工商 / 采购商"
-        company_type_en = "Midstream Processor / Buyer"
+        company_type = "中游加工商 / 采购商 (Midstream Processor / Buyer)"
     else:
-        company_type_cn = "上游供应商 / 种植商"
-        company_type_en = "Upstream Supplier / Plantation"
+        company_type = "上游供应商 / 种植商 (Upstream Supplier / Plantation)"
     
-    c.drawCentredString(WIDTH/2, y, 
-                       f"公司类型 (Company Type): {company_type_cn} ({company_type_en})")
+    c.drawCentredString(WIDTH/2, y, f"公司类型 (Company Type): {company_type}")
     y -= 0.6*cm
     
     period = env_data.get('analysis', {}).get('period', 'N/A')
-    c.drawCentredString(WIDTH/2, y, 
-                       f"评估周期 (Assessment Period): {period}")
+    c.drawCentredString(WIDTH/2, y, f"评估周期 (Assessment Period): {period}")
     
     # 风险概览
     y = HEIGHT - 15*cm
@@ -350,24 +395,27 @@ def generate_pdf_report(data):
     
     if is_cofco:
         findings = env_analysis.get('key_findings', ['N/A'])
-        y = draw_wrapped_block(c, y, [f"• {f}" for f in findings])
+        y = draw_text_block(c, y, [f"• {f}" for f in findings])
         y -= 0.5*cm
-        y = draw_wrapped_block(c, y, [f"结论: {env_analysis.get('conclusion', 'N/A')}"], FONT_BOLD, 10)
+        y = draw_text_block(c, y, [f"结论: {env_analysis.get('conclusion', 'N/A')}"], 
+                           FONT_BOLD, 10)
     else:
         evidence = env_analysis.get('evidence', {})
         conclusion = evidence.get('conclusion', env_analysis.get('result', 'N/A'))
-        y = draw_wrapped_block(c, y, [conclusion])
+        y = draw_text_block(c, y, [conclusion])
     
-    # 法规合规性
+    # 【关键位置】法规合规性 - 这里会正确处理项目符号
     y -= 1*cm
     y = draw_bilingual_field(c, y, "法规合规性", "Regulatory Compliance", "")
     
     compliance = env_data.get('compliance', {})
     if compliance:
+        # 生成带项目符号的列表
         compliance_items = [f"• {v}" for v in compliance.values()]
-        y = draw_wrapped_block(c, y, compliance_items)
+        # 使用修复后的函数绘制
+        y = draw_text_block(c, y, compliance_items)
     else:
-        y = draw_wrapped_block(c, y, ["• 无数据 (No data)"])
+        y = draw_text_block(c, y, ["• 无数据 (No data)"])
     
     draw_footer(c, page_num)
     c.showPage()
@@ -386,7 +434,7 @@ def generate_pdf_report(data):
         y = draw_bilingual_field(c, y, "风险来源", "Risk Source", 
                                 social_analysis.get('risk_source', 'N/A'))
         y = draw_bilingual_field(c, y, "关键问题", "Key Concern", "")
-        y = draw_wrapped_block(c, y, [social_analysis.get('key_concern', 'N/A')])
+        y = draw_text_block(c, y, [social_analysis.get('key_concern', 'N/A')])
         y -= 1*cm
     
     c.setFont(FONT_BOLD, 10)
@@ -399,8 +447,8 @@ def generate_pdf_report(data):
     
     key_events = social_data.get('key_events', [])
     if not key_events:
-        y = draw_wrapped_block(c, y, 
-                              ["未发现重大负面舆情事件 (No significant negative events found)"])
+        y = draw_text_block(c, y, 
+                           ["未发现重大负面舆情事件 (No significant negative events found)"])
     
     for event in key_events[:4]:
         if y < 8 * cm:
@@ -417,9 +465,9 @@ def generate_pdf_report(data):
         
         y = draw_bilingual_field(c, y, "日期 (Date)", "", event_date)
         y = draw_bilingual_field(c, y, "事件 (Event)", "", "")
-        y = draw_wrapped_block(c, y, [event_text], font_size=9)
+        y = draw_text_block(c, y, [event_text], font_size=9)
         y = draw_bilingual_field(c, y, "影响 (Impact)", "", "")
-        y = draw_wrapped_block(c, y, [event_impact], font_size=9)
+        y = draw_text_block(c, y, [event_impact], font_size=9)
         
         c.line(MARGIN_LEFT, y, MARGIN_RIGHT, y)
         y -= 0.5*cm
@@ -439,9 +487,9 @@ def generate_pdf_report(data):
         
         if is_cofco:
             suppliers = supply_chain_data.get('upstream', {}).get('suppliers', [])
-            y = draw_wrapped_block(c, y, 
-                                 ["已识别上游高风险供应商 (High-risk upstream suppliers identified):"], 
-                                 FONT_BOLD, 10)
+            y = draw_text_block(c, y, 
+                              ["已识别上游高风险供应商 (High-risk upstream suppliers identified):"], 
+                              FONT_BOLD, 10)
             
             for supplier in suppliers[:3]:
                 name = supplier.get('name', 'N/A')
@@ -450,13 +498,13 @@ def generate_pdf_report(data):
                 y = draw_bilingual_field(c, y, f"• {name}", "", status, value_color=color)
         else:
             markets = supply_chain_data.get('downstream', {}).get('markets', [])
-            y = draw_wrapped_block(c, y, 
-                                 ["下游市场合规风险 (Downstream Market Compliance Risk):"], 
-                                 FONT_BOLD, 10)
-            y = draw_wrapped_block(c, y, 
-                                 [f"• 主要市场 (Target Markets): {', '.join(markets)}"])
-            y = draw_wrapped_block(c, y, 
-                                 [f"• 风险点 (Risk): 欧盟EUDR及美国CBP法规"])
+            y = draw_text_block(c, y, 
+                              ["下游市场合规风险 (Downstream Market Compliance Risk):"], 
+                              FONT_BOLD, 10)
+            y = draw_text_block(c, y, 
+                              [f"• 主要市场 (Target Markets): {', '.join(markets)}"])
+            y = draw_text_block(c, y, 
+                              [f"• 风险点 (Risk): 欧盟EUDR及美国CBP法规 (EUDR & US CBP Regulations)"])
         
         y -= 1*cm
     
@@ -464,19 +512,20 @@ def generate_pdf_report(data):
     
     if is_cofco:
         recs = [
-            "1. 启动对高风险供应商的详细尽职调查。",
-            "2. 准备EUDR合规文件，确保上游数据可追溯。",
-            "3. 增加对低风险供应商的采购比例。"
+            "1. 启动对高风险供应商的详细尽职调查。(Conduct due diligence on high-risk suppliers.)",
+            "2. 准备EUDR合规文件，确保上游数据可追溯。(Prepare EUDR documentation, ensure traceability.)",
+            "3. 增加对低风险供应商的采购比例。(Increase procurement from low-risk suppliers.)"
         ]
     else:
         recs = [
-            "1. 立即提交CBP（劳工问题）或EUDR（毁林问题）整改报告。",
-            "2. 实施并披露劳工/环境整改措施。",
-            "3. 建立透明的申诉机制。"
+            "1. 立即提交CBP（劳工问题）或EUDR（毁林问题）整改报告。(Submit CBP/EUDR remediation report.)",
+            "2. 实施并披露劳工/环境整改措施。(Implement and disclose remediation actions.)",
+            "3. 建立透明的申诉机制。(Establish a transparent grievance mechanism.)"
         ]
     
-    y = draw_wrapped_block(c, y, recs)
+    y = draw_text_block(c, y, recs)
     
+    # 联系信息
     y -= 2*cm
     c.setFont(FONT_BOLD, 11)
     c.setFillColor(COLOR_TITLE)
@@ -487,9 +536,9 @@ def generate_pdf_report(data):
     c.setFillColor(COLOR_TEXT)
     c.drawString(MARGIN_LEFT + 0.5*cm, y, "绿链 GreenLink ESG 平台")
     y -= 0.5*cm
-    c.drawString(MARGIN_LEFT + 0.5*cm, y, "邮箱: support@greenlink.com")
+    c.drawString(MARGIN_LEFT + 0.5*cm, y, "邮箱 (Email): support@greenlink.com")
     y -= 0.5*cm
-    c.drawString(MARGIN_LEFT + 0.5*cm, y, "网站: www.greenlink.com")
+    c.drawString(MARGIN_LEFT + 0.5*cm, y, "网站 (Website): www.greenlink.com (Demo)")
     
     draw_footer(c, page_num)
     
