@@ -71,9 +71,7 @@ st.markdown("""
     }
     .tech-card h3 { color: #00F2FF !important; margin-top: 0; font-weight: 800; }
     
-    /* ========================================================================
-       4. 侧边栏 (Sidebar) 暴力修复
-       ======================================================================== */
+    /* 4. 侧边栏 (Sidebar) */
     section[data-testid="stSidebar"] {
         background-color: #000000 !important;
         border-right: 1px solid #333;
@@ -150,27 +148,30 @@ st.markdown("""
         fill: #00FF41 !important; stroke: #00FF41 !important;
     }
 
-    /* 13. Expander (折叠面板) 修复 */
+    /* ========================================================================
+       13. Expander (折叠面板) 核弹级修复 - 强制所有内容变白
+       ======================================================================== */
+    /* 容器背景 */
     div[data-testid="stExpander"] {
-        background-color: #0A0A0A !important;
+        background-color: #000000 !important;
         border: 1px solid #333 !important;
         border-radius: 6px !important;
-        color: #FFFFFF !important;
     }
+    /* 摘要标题 */
     div[data-testid="stExpander"] summary {
         color: #00FF41 !important;
         font-weight: bold !important;
+        background-color: #111 !important;
+        border-bottom: 1px solid #333;
     }
     div[data-testid="stExpander"] summary:hover {
         color: #00F2FF !important;
     }
-    div[data-testid="stExpander"] div[role="group"] {
+    /* 内容区域：使用通配符强制所有子元素变为浅灰色/白色 */
+    div[data-testid="stExpander"] div[role="group"],
+    div[data-testid="stExpander"] div[role="group"] * {
         color: #E0E0E0 !important;
-    }
-    div[data-testid="stExpander"] p, 
-    div[data-testid="stExpander"] li, 
-    div[data-testid="stExpander"] span {
-        color: #E0E0E0 !important;
+        background-color: #000000 !important;
     }
     
     /* 14. 按钮样式增强 */
@@ -416,14 +417,11 @@ with tab3:
         
         loan_amount = st.number_input("贷款金额 (万元)", min_value=100, value=5000, step=100)
         
-        # === 新增按钮：开始评级测算 ===
-        calc_btn = st.button("🚀 开始 AI 评级测算 (START RATING)", type="primary", use_container_width=True)
-        
-        # Session State 保持结果显示
+        # 按钮 (Session State 状态保持)
         if 'show_loan_result' not in st.session_state:
             st.session_state.show_loan_result = False
         
-        if calc_btn:
+        if st.button("🚀 开始 AI 评级测算 (START RATING)", type="primary", use_container_width=True):
             st.session_state.show_loan_result = True
             
         if st.session_state.show_loan_result:
@@ -490,4 +488,4 @@ with tab4:
         with c3: st.markdown("""<div class="protocol-box"><div class="protocol-title">ILO (劳工公约)</div><div style="color:#BBB; font-size:0.85rem;">• <strong>重点:</strong> 规避美国 CBP 禁令<br>• <strong>审计:</strong> SA8000 认证</div></div>""", unsafe_allow_html=True)
 
 st.sidebar.markdown("---")
-st.sidebar.markdown("""<div style="font-size: 0.8rem; color: #666;">POWERED BY <strong style="color: #FFF;">GREENLINK TECH</strong><br>v3.4.0 (Button Added)</div>""", unsafe_allow_html=True)
+st.sidebar.markdown("""<div style="font-size: 0.8rem; color: #666;">POWERED BY <strong style="color: #FFF;">GREENLINK TECH</strong><br>v3.5.0 (Nuclear Fix)</div>""", unsafe_allow_html=True)
