@@ -72,7 +72,7 @@ st.markdown("""
     .tech-card h3 { color: #00F2FF !important; margin-top: 0; font-weight: 800; }
     
     /* ========================================================================
-       4. 侧边栏 (Sidebar) 暴力修复 - 针对下拉菜单不可见问题
+       4. 侧边栏 (Sidebar) 暴力修复
        ======================================================================== */
     section[data-testid="stSidebar"] {
         background-color: #000000 !important;
@@ -81,8 +81,11 @@ st.markdown("""
     section[data-testid="stSidebar"] * {
         color: #FFFFFF !important;
     }
-    
-    /* 强制下拉菜单选项 (Options) 黑底白字 */
+    div[data-baseweb="select"] > div {
+        background-color: #1A1A1A !important;
+        color: #FFFFFF !important;
+        border: 1px solid #444 !important;
+    }
     div[data-baseweb="popover"], div[data-baseweb="menu"], ul[role="listbox"] {
         background-color: #000000 !important;
         border-color: #333 !important;
@@ -91,29 +94,19 @@ st.markdown("""
         background-color: #000000 !important;
         color: #FFFFFF !important;
     }
-    /* 鼠标悬停高亮 */
     li[role="option"]:hover, li[role="option"][aria-selected="true"] {
         background-color: #00FF41 !important;
         color: #000000 !important;
     }
-    /* 选择框本体 (Selected Value) */
-    div[data-baseweb="select"] > div {
-        background-color: #1A1A1A !important;
-        color: #FFFFFF !important;
-        border: 1px solid #444 !important;
-    }
-    div[data-testid="stSelectbox"] span {
-        color: #FFFFFF !important;
-    }
 
-    /* 5. 评分标准图例 (新增 - 紧凑型) */
+    /* 5. 评分标准图例 */
     .score-legend-compact {
         background: #080808;
         border: 1px solid #333;
         padding: 8px;
         border-radius: 4px;
         font-size: 0.8rem;
-        height: 100%; /* 撑满高度 */
+        height: 100%; 
     }
     .legend-row {
         display: flex;
@@ -153,10 +146,47 @@ st.markdown("""
     .chain-box { text-align: center; padding: 15px; border-radius: 8px; font-weight: bold; margin: 5px; }
     .arrow { color: #666; font-size: 1.5rem; display: flex; align-items: center; justify-content: center; }
 
-    /* 强制按钮可见 */
     [data-testid="stImage"] button svg, [data-testid="stVegaLiteChart"] button svg {
         fill: #00FF41 !important; stroke: #00FF41 !important;
     }
+
+    /* 13. Expander (折叠面板) 修复 */
+    div[data-testid="stExpander"] {
+        background-color: #0A0A0A !important;
+        border: 1px solid #333 !important;
+        border-radius: 6px !important;
+        color: #FFFFFF !important;
+    }
+    div[data-testid="stExpander"] summary {
+        color: #00FF41 !important;
+        font-weight: bold !important;
+    }
+    div[data-testid="stExpander"] summary:hover {
+        color: #00F2FF !important;
+    }
+    div[data-testid="stExpander"] div[role="group"] {
+        color: #E0E0E0 !important;
+    }
+    div[data-testid="stExpander"] p, 
+    div[data-testid="stExpander"] li, 
+    div[data-testid="stExpander"] span {
+        color: #E0E0E0 !important;
+    }
+    
+    /* 14. 按钮样式增强 */
+    button[kind="primary"] {
+        background-color: #00FF41 !important;
+        color: #000 !important;
+        border: none !important;
+        font-weight: bold !important;
+        font-family: 'Courier New', monospace !important;
+        transition: all 0.3s !important;
+    }
+    button[kind="primary"]:hover {
+        background-color: #00F2FF !important;
+        box-shadow: 0 0 15px rgba(0, 242, 255, 0.5) !important;
+    }
+
 </style>
 """, unsafe_allow_html=True)
 
@@ -245,13 +275,10 @@ with tab1:
     with col_chart:
         st.markdown("##### 核心指标 (Core Metrics)")
         
-        # === 修复：左右分栏布局 (分数在左，标准在右) ===
         c_metrics, c_legend = st.columns([1.2, 1])
-        
         with c_metrics:
             st.metric("E-Score", f"{env_score}", delta="-2.5", delta_color="inverse")
             st.metric("S-Score", f"{soc_score}", delta="+5.1", delta_color="inverse")
-            
         with c_legend:
             st.markdown("""
             <div class="score-legend-compact">
@@ -316,15 +343,14 @@ with tab1:
                 """, unsafe_allow_html=True)
             st.success("✅ 证据链完整度: 100% (3/3 Verified)")
 
-            # AI评分逻辑解释
             st.markdown("---")
             with st.expander("💡 为什么只显示这 3 个事件？(AI Scoring Logic)", expanded=False):
                 st.markdown("""
                 <div style="font-size: 0.95rem; color: #DDD;">
                     <p><strong>1. 关键风险归因 (Pareto Principle):</strong><br>
-                    在 ESG 风险评估中，少数<strong>重大合规事件</strong>（如美国 CBP 暂扣令、欧盟反毁林调查）往往对企业信用具有<strong>"一票否决权"</strong>。系统从数千条舆情中筛选出这 Top 3 关键事件，因为它们解释了当前高风险评分 80% 的来源。</p>
+                    在 ESG 风险评估中，少数<strong>重大合规事件</strong>（如美国 CBP 暂扣令、欧盟反毁林调查）往往对企业信用具有<strong>"一票否决权"</strong>。系统筛选出这 Top 3 关键事件，解释了当前高风险评分 80% 的来源。</p>
                     <p><strong>2. 时间窗口与活跃度 (Time Window):</strong><br>
-                    AI 模型优先展示<strong>"当前活跃 (Active)"</strong>或<strong>"未决 (Pending)"</strong>的风险事件。已解决的历史旧闻权重会随时间指数级衰减，不会出现在核心警示区。</p>
+                    AI 模型优先展示<strong>"当前活跃 (Active)"</strong>或<strong>"未决 (Pending)"</strong>的风险事件。已解决的历史旧闻权重会随时间衰减。</p>
                 </div>
                 """, unsafe_allow_html=True)
         else:
@@ -389,20 +415,34 @@ with tab3:
         st.markdown("""<div class="tech-card" style="border-left-color: #00F2FF;"><strong>算法逻辑:</strong> 基于企业的实时 ESG 评分，计算可获得的绿色贷款利率优惠 (Basis Points)。</div>""", unsafe_allow_html=True)
         
         loan_amount = st.number_input("贷款金额 (万元)", min_value=100, value=5000, step=100)
-        base_rate = 4.35
-        discount_bp = 50 if total_score <= 30 else (20 if total_score <= 50 else 0)
-        rating_color = "#00FF41" if total_score <= 30 else ("#ADFF2F" if total_score <= 50 else "#FFA500")
-        rating_label = "🌿 深绿企业" if total_score <= 30 else ("🍃 浅绿企业" if total_score <= 50 else "🍂 棕色企业")
         
-        final_rate = base_rate - (discount_bp / 100)
-        annual_saving = loan_amount * (discount_bp / 10000)
+        # === 新增按钮：开始评级测算 ===
+        calc_btn = st.button("🚀 开始 AI 评级测算 (START RATING)", type="primary", use_container_width=True)
         
-        st.markdown(f'<div style="font-size: 1.1rem; font-weight: bold; color: {rating_color}; margin: 10px 0;">评级结果: {rating_label}</div>', unsafe_allow_html=True)
-        c1, c2, c3 = st.columns(3)
-        c1.metric("基础利率", f"{base_rate}%")
-        c2.metric("ESG 优惠", f"-{discount_bp} bp")
-        c3.metric("执行利率", f"{final_rate:.2f}%")
-        st.markdown(f"""<div style="background: #111; border: 1px solid #00FF41; padding: 15px; border-radius: 6px; text-align: center; margin-top: 15px;"><span style="color: #888; font-size: 0.9rem;">预计年利息节省</span><br><span style="font-size: 1.8rem; color: #00FF41; font-weight: bold; font-family: monospace;">¥ {annual_saving:,.0f}</span></div>""", unsafe_allow_html=True)
+        # Session State 保持结果显示
+        if 'show_loan_result' not in st.session_state:
+            st.session_state.show_loan_result = False
+        
+        if calc_btn:
+            st.session_state.show_loan_result = True
+            
+        if st.session_state.show_loan_result:
+            base_rate = 4.35
+            discount_bp = 50 if total_score <= 30 else (20 if total_score <= 50 else 0)
+            rating_color = "#00FF41" if total_score <= 30 else ("#ADFF2F" if total_score <= 50 else "#FFA500")
+            rating_label = "🌿 深绿企业" if total_score <= 30 else ("🍃 浅绿企业" if total_score <= 50 else "🍂 棕色企业")
+            final_rate = base_rate - (discount_bp / 100)
+            annual_saving = loan_amount * (discount_bp / 10000)
+            
+            st.markdown("---")
+            st.markdown(f'<div style="font-size: 1.1rem; font-weight: bold; color: {rating_color}; margin: 10px 0;">评级结果: {rating_label}</div>', unsafe_allow_html=True)
+            c1, c2, c3 = st.columns(3)
+            c1.metric("基础利率", f"{base_rate}%")
+            c2.metric("ESG 优惠", f"-{discount_bp} bp")
+            c3.metric("执行利率", f"{final_rate:.2f}%")
+            st.markdown(f"""<div style="background: #111; border: 1px solid #00FF41; padding: 15px; border-radius: 6px; text-align: center; margin-top: 15px;"><span style="color: #888; font-size: 0.9rem;">预计年利息节省</span><br><span style="font-size: 1.8rem; color: #00FF41; font-weight: bold; font-family: monospace;">¥ {annual_saving:,.0f}</span></div>""", unsafe_allow_html=True)
+        else:
+            st.info("💡 请输入贷款金额，点击上方按钮开始测算")
         
     with fin_col2:
         st.markdown("### 📉 财务风险量化")
@@ -450,4 +490,4 @@ with tab4:
         with c3: st.markdown("""<div class="protocol-box"><div class="protocol-title">ILO (劳工公约)</div><div style="color:#BBB; font-size:0.85rem;">• <strong>重点:</strong> 规避美国 CBP 禁令<br>• <strong>审计:</strong> SA8000 认证</div></div>""", unsafe_allow_html=True)
 
 st.sidebar.markdown("---")
-st.sidebar.markdown("""<div style="font-size: 0.8rem; color: #666;">POWERED BY <strong style="color: #FFF;">GREENLINK TECH</strong><br>v3.2.0 (Stable)</div>""", unsafe_allow_html=True)
+st.sidebar.markdown("""<div style="font-size: 0.8rem; color: #666;">POWERED BY <strong style="color: #FFF;">GREENLINK TECH</strong><br>v3.4.0 (Button Added)</div>""", unsafe_allow_html=True)
