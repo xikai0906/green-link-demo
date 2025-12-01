@@ -72,7 +72,7 @@ st.markdown("""
     .tech-card h3 { color: #00F2FF !important; margin-top: 0; font-weight: 800; }
     
     /* ========================================================================
-       4. 侧边栏 (Sidebar) 终极修复 - 强制黑底白字
+       4. 侧边栏 (Sidebar) 暴力修复 - 针对下拉菜单不可见问题
        ======================================================================== */
     section[data-testid="stSidebar"] {
         background-color: #000000 !important;
@@ -81,61 +81,57 @@ st.markdown("""
     section[data-testid="stSidebar"] * {
         color: #FFFFFF !important;
     }
-    /* 下拉框容器 */
+    
+    /* 强制下拉菜单选项 (Options) 黑底白字 */
+    div[data-baseweb="popover"], div[data-baseweb="menu"], ul[role="listbox"] {
+        background-color: #000000 !important;
+        border-color: #333 !important;
+    }
+    li[role="option"] {
+        background-color: #000000 !important;
+        color: #FFFFFF !important;
+    }
+    /* 鼠标悬停高亮 */
+    li[role="option"]:hover, li[role="option"][aria-selected="true"] {
+        background-color: #00FF41 !important;
+        color: #000000 !important;
+    }
+    /* 选择框本体 (Selected Value) */
     div[data-baseweb="select"] > div {
         background-color: #1A1A1A !important;
         color: #FFFFFF !important;
-        border-color: #555 !important;
-    }
-    /* 下拉选项弹出层 */
-    div[data-baseweb="popover"] {
-        background-color: #000000 !important;
         border: 1px solid #444 !important;
     }
-    div[data-baseweb="menu"] {
-        background-color: #000000 !important;
-    }
-    /* 选项列表项 */
-    div[data-baseweb="menu"] ul li {
-        color: #FFFFFF !important;
-        background-color: #000000 !important;
-    }
-    /* 鼠标悬停高亮 */
-    div[data-baseweb="menu"] ul li:hover {
-        background-color: #00FF41 !important; 
-        color: #000000 !important;
-    }
-    /* 选中值 */
-    div[data-testid="stSelectbox"] div[data-baseweb="select"] div {
+    div[data-testid="stSelectbox"] span {
         color: #FFFFFF !important;
     }
 
-    /* 5. 评分标准图例 (新增) */
-    .score-legend {
-        background: #0A0A0A;
+    /* 5. 评分标准图例 (新增 - 紧凑型) */
+    .score-legend-compact {
+        background: #080808;
         border: 1px solid #333;
-        padding: 10px;
-        border-radius: 6px;
-        margin-top: 10px;
-        font-size: 0.85rem;
+        padding: 8px;
+        border-radius: 4px;
+        font-size: 0.8rem;
+        height: 100%; /* 撑满高度 */
     }
     .legend-row {
         display: flex;
         align-items: center;
-        margin-bottom: 4px;
+        margin-bottom: 3px;
         color: #CCC;
     }
     .color-dot {
-        width: 10px;
-        height: 10px;
-        border-radius: 2px;
-        margin-right: 8px;
+        width: 8px;
+        height: 8px;
+        border-radius: 50%;
+        margin-right: 6px;
         display: inline-block;
     }
 
     /* 6. 其他 UI 修复 */
-    div[data-testid="stMetricLabel"] { color: #AAAAAA !important; }
-    div[data-testid="stMetricValue"] { color: #00FF41 !important; font-family: 'Courier New', monospace; }
+    div[data-testid="stMetricLabel"] { color: #AAAAAA !important; font-size: 0.85rem !important; }
+    div[data-testid="stMetricValue"] { color: #00FF41 !important; font-family: 'Courier New', monospace; font-size: 1.8rem !important; }
     
     .source-link-btn {
         display: inline-block; margin-top: 8px; padding: 4px 10px;
@@ -247,21 +243,25 @@ with tab1:
             """, unsafe_allow_html=True)
 
     with col_chart:
-        # === 修复：添加评分标准图例 ===
         st.markdown("##### 核心指标 (Core Metrics)")
-        m1, m2 = st.columns(2)
-        with m1: st.metric("E-Score", f"{env_score}", delta="-2.5", delta_color="inverse")
-        with m2: st.metric("S-Score", f"{soc_score}", delta="+5.1", delta_color="inverse")
+        
+        # === 修复：左右分栏布局 (分数在左，标准在右) ===
+        c_metrics, c_legend = st.columns([1.2, 1])
+        
+        with c_metrics:
+            st.metric("E-Score", f"{env_score}", delta="-2.5", delta_color="inverse")
+            st.metric("S-Score", f"{soc_score}", delta="+5.1", delta_color="inverse")
             
-        st.markdown("""
-        <div class="score-legend">
-            <div style="color: #FFF; margin-bottom: 8px; border-bottom:1px solid #333; padding-bottom:4px;"><strong>📏 风险分值标准 (Risk Scale)</strong></div>
-            <div class="legend-row"><span class="color-dot" style="background:#00FF41;"></span> 00 - 25 : 低风险 (Low)</div>
-            <div class="legend-row"><span class="color-dot" style="background:#ADFF2F;"></span> 25 - 50 : 中低风险 (Med-Low)</div>
-            <div class="legend-row"><span class="color-dot" style="background:#FFFF00;"></span> 50 - 75 : 中高风险 (Med-High)</div>
-            <div class="legend-row"><span class="color-dot" style="background:#FF3333;"></span> 75 - 100 : 高风险 (High)</div>
-        </div>
-        """, unsafe_allow_html=True)
+        with c_legend:
+            st.markdown("""
+            <div class="score-legend-compact">
+                <div style="color: #FFF; margin-bottom: 5px; border-bottom:1px solid #333;"><strong>📏 评分标准</strong></div>
+                <div class="legend-row"><span class="color-dot" style="background:#00FF41;"></span>0-25: 优</div>
+                <div class="legend-row"><span class="color-dot" style="background:#ADFF2F;"></span>25-50: 良</div>
+                <div class="legend-row"><span class="color-dot" style="background:#FFFF00;"></span>50-75: 中</div>
+                <div class="legend-row"><span class="color-dot" style="background:#FF3333;"></span>75+: 差</div>
+            </div>
+            """, unsafe_allow_html=True)
 
         st.markdown("<br>", unsafe_allow_html=True)
         chart_data = pd.DataFrame(np.random.randn(20, 2) + [env_score/10, soc_score/10], columns=['Env', 'Soc'])
@@ -316,14 +316,13 @@ with tab1:
                 """, unsafe_allow_html=True)
             st.success("✅ 证据链完整度: 100% (3/3 Verified)")
 
-            # === 修复：增加AI评分逻辑解释模块 ===
+            # AI评分逻辑解释
             st.markdown("---")
             with st.expander("💡 为什么只显示这 3 个事件？(AI Scoring Logic)", expanded=False):
                 st.markdown("""
                 <div style="font-size: 0.95rem; color: #DDD;">
                     <p><strong>1. 关键风险归因 (Pareto Principle):</strong><br>
                     在 ESG 风险评估中，少数<strong>重大合规事件</strong>（如美国 CBP 暂扣令、欧盟反毁林调查）往往对企业信用具有<strong>"一票否决权"</strong>。系统从数千条舆情中筛选出这 Top 3 关键事件，因为它们解释了当前高风险评分 80% 的来源。</p>
-                    
                     <p><strong>2. 时间窗口与活跃度 (Time Window):</strong><br>
                     AI 模型优先展示<strong>"当前活跃 (Active)"</strong>或<strong>"未决 (Pending)"</strong>的风险事件。已解决的历史旧闻权重会随时间指数级衰减，不会出现在核心警示区。</p>
                 </div>
@@ -451,4 +450,4 @@ with tab4:
         with c3: st.markdown("""<div class="protocol-box"><div class="protocol-title">ILO (劳工公约)</div><div style="color:#BBB; font-size:0.85rem;">• <strong>重点:</strong> 规避美国 CBP 禁令<br>• <strong>审计:</strong> SA8000 认证</div></div>""", unsafe_allow_html=True)
 
 st.sidebar.markdown("---")
-st.sidebar.markdown("""<div style="font-size: 0.8rem; color: #666;">POWERED BY <strong style="color: #FFF;">GREENLINK TECH</strong><br>v3.1.0 (Ultimate)</div>""", unsafe_allow_html=True)
+st.sidebar.markdown("""<div style="font-size: 0.8rem; color: #666;">POWERED BY <strong style="color: #FFF;">GREENLINK TECH</strong><br>v3.2.0 (Stable)</div>""", unsafe_allow_html=True)
