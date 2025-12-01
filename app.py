@@ -149,39 +149,51 @@ st.markdown("""
     }
 
     /* ========================================================================
-       13. Expander (折叠面板) 核弹级修复 - 强制所有内容变白
+       13. Expander (折叠面板) 终极双重锁定修复
        ======================================================================== */
-    /* 容器背景 */
-    div[data-testid="stExpander"] {
-        background-color: #000000 !important;
+    
+    /* 针对 <details> 渲染模式 */
+    details[data-testid="stExpander"] {
+        background-color: #0A0A0A !important;
         border: 1px solid #333 !important;
         border-radius: 6px !important;
+        color: #FFFFFF !important;
     }
-    /* 摘要标题 */
-    div[data-testid="stExpander"] summary {
+    details[data-testid="stExpander"] summary {
         color: #00FF41 !important;
-        font-weight: bold !important;
         background-color: #111 !important;
-        border-bottom: 1px solid #333;
+        border-bottom: 1px solid #333 !important;
     }
-    div[data-testid="stExpander"] summary:hover {
-        color: #00F2FF !important;
+    /* 针对 <div> 渲染模式 (旧版兼容) */
+    div[data-testid="stExpander"] {
+        background-color: #0A0A0A !important;
+        border: 1px solid #333 !important;
+        color: #FFFFFF !important;
     }
-    /* 内容区域：使用通配符强制所有子元素变为浅灰色/白色 */
-    div[data-testid="stExpander"] div[role="group"],
-    div[data-testid="stExpander"] div[role="group"] * {
-        color: #E0E0E0 !important;
+    
+    /* 强制内容区域所有文字颜色 - 通杀所有子元素 */
+    details[data-testid="stExpander"] > div,
+    div[data-testid="stExpander"] > div[role="group"] {
         background-color: #000000 !important;
     }
     
-    /* 14. 按钮样式增强 */
+    details[data-testid="stExpander"] *,
+    div[data-testid="stExpander"] * {
+        color: #E0E0E0 !important;
+    }
+    
+    /* 特别针对协议卡片内部 */
+    .protocol-box div, .protocol-box span {
+        color: #E0E0E0 !important;
+    }
+    
+    /* 14. 按钮样式 */
     button[kind="primary"] {
         background-color: #00FF41 !important;
         color: #000 !important;
         border: none !important;
         font-weight: bold !important;
         font-family: 'Courier New', monospace !important;
-        transition: all 0.3s !important;
     }
     button[kind="primary"]:hover {
         background-color: #00F2FF !important;
@@ -347,7 +359,7 @@ with tab1:
             st.markdown("---")
             with st.expander("💡 为什么只显示这 3 个事件？(AI Scoring Logic)", expanded=False):
                 st.markdown("""
-                <div style="font-size: 0.95rem; color: #DDD;">
+                <div style="font-size: 0.95rem;">
                     <p><strong>1. 关键风险归因 (Pareto Principle):</strong><br>
                     在 ESG 风险评估中，少数<strong>重大合规事件</strong>（如美国 CBP 暂扣令、欧盟反毁林调查）往往对企业信用具有<strong>"一票否决权"</strong>。系统筛选出这 Top 3 关键事件，解释了当前高风险评分 80% 的来源。</p>
                     <p><strong>2. 时间窗口与活跃度 (Time Window):</strong><br>
@@ -488,4 +500,4 @@ with tab4:
         with c3: st.markdown("""<div class="protocol-box"><div class="protocol-title">ILO (劳工公约)</div><div style="color:#BBB; font-size:0.85rem;">• <strong>重点:</strong> 规避美国 CBP 禁令<br>• <strong>审计:</strong> SA8000 认证</div></div>""", unsafe_allow_html=True)
 
 st.sidebar.markdown("---")
-st.sidebar.markdown("""<div style="font-size: 0.8rem; color: #666;">POWERED BY <strong style="color: #FFF;">GREENLINK TECH</strong><br>v3.5.0 (Nuclear Fix)</div>""", unsafe_allow_html=True)
+st.sidebar.markdown("""<div style="font-size: 0.8rem; color: #666;">POWERED BY <strong style="color: #FFF;">GREENLINK TECH</strong><br>v3.6.0 (Dual-Lock Fix)</div>""", unsafe_allow_html=True)
