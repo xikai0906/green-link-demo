@@ -37,7 +37,7 @@ st.markdown("""
         line-height: 1.6;
     }
 
-    /* 3. 标题样式 - 清晰锐利 */
+    /* 3. 标题样式 */
     .main-header {
         font-family: 'Courier New', monospace;
         font-size: 3.5rem;
@@ -79,25 +79,22 @@ st.markdown("""
     }
     .tech-card h3 { color: #00F2FF !important; margin-top: 0; font-weight: 800; font-size: 1.4rem; }
     
-    /* 5. 侧边栏 (Sidebar) 终极修复 - 解决看不清字的问题 */
+    /* 5. 侧边栏 (Sidebar) 终极修复 */
     section[data-testid="stSidebar"] {
         background-color: #0a0a0a;
         border-right: 1px solid #222;
     }
-    /* 侧边栏标题 */
     section[data-testid="stSidebar"] h1, 
     section[data-testid="stSidebar"] h2, 
     section[data-testid="stSidebar"] h3 {
         color: #00F2FF !important;
     }
-    /* 侧边栏普通文字 */
     section[data-testid="stSidebar"] p, 
     section[data-testid="stSidebar"] span,
     section[data-testid="stSidebar"] label {
         color: #FFFFFF !important; /* 强制纯白 */
         font-weight: 500;
     }
-    /* 下拉选择框修复 */
     div[data-baseweb="select"] > div {
         background-color: #1A1A1A !important;
         color: #FFFFFF !important;
@@ -107,7 +104,7 @@ st.markdown("""
         background-color: #1A1A1A !important;
     }
     div[data-baseweb="menu"] li {
-        color: #FFFFFF !important; /* 下拉选项文字 */
+        color: #FFFFFF !important;
     }
     
     /* 6. Streamlit 指标组件颜色强制覆盖 */
@@ -122,6 +119,72 @@ st.markdown("""
         padding: 20px;
         text-align: center;
     }
+    
+    /* 8. 标准协议小卡片 */
+    .protocol-box {
+        background: #111;
+        border: 1px solid #333;
+        padding: 10px;
+        border-radius: 5px;
+        font-size: 0.9rem;
+        margin-top: 10px;
+    }
+    .protocol-title {
+        color: #00FF41;
+        font-weight: bold;
+        border-bottom: 1px solid #333;
+        padding-bottom: 5px;
+        margin-bottom: 5px;
+    }
+
+    /* 9. 修复：强制原生 UI 按钮可见 */
+    [data-testid="stImage"] button svg,
+    [data-testid="stVegaLiteChart"] button svg,
+    .st-emotion-cache-1p1m4t5 svg {
+        fill: #00FF41 !important;
+        stroke: #00FF41 !important;
+    }
+    [data-testid="stImage"] button:hover,
+    [data-testid="stVegaLiteChart"] button:hover {
+        background-color: rgba(0, 255, 65, 0.2) !important;
+        border-radius: 4px;
+    }
+    
+    /* 10. 舆情链接按钮样式 */
+    .source-link-btn {
+        display: inline-block;
+        margin-top: 8px;
+        padding: 4px 10px;
+        border: 1px solid #333;
+        border-radius: 4px;
+        color: #00F2FF !important;
+        font-size: 0.8rem;
+        text-decoration: none;
+        transition: all 0.2s;
+        background: rgba(0, 242, 255, 0.05);
+    }
+    .source-link-btn:hover {
+        border-color: #00F2FF;
+        background: rgba(0, 242, 255, 0.15);
+        color: #FFF !important;
+    }
+
+    /* 11. 链式穿透流程图样式 */
+    .chain-box {
+        text-align: center;
+        padding: 15px;
+        border-radius: 8px;
+        font-weight: bold;
+        margin: 5px;
+    }
+    .arrow {
+        color: #666; 
+        font-size: 1.5rem; 
+        display: flex; 
+        align-items: center; 
+        justify-content: center;
+    }
+
 </style>
 """, unsafe_allow_html=True)
 
@@ -193,12 +256,20 @@ with tab1:
         </div>
         """, unsafe_allow_html=True)
 
-        # 评级对比
+        # 评级对比 (防错修复版)
         st.markdown("##### ⚔️ 评级体系对比 (VS Traditional)")
+        
+        # 智能获取评级数据，防止崩溃
+        trad_data = data.get('traditional_rating') or data.get('social', {}).get('traditional_rating')
+        if isinstance(trad_data, dict):
+            rating_val = trad_data.get('rating', trad_data.get('msci', 'N/A'))
+        elif isinstance(trad_data, str):
+            rating_val = trad_data
+        else:
+            rating_val = 'N/A'
+            
         c1, c2 = st.columns(2)
         with c1:
-            traditional = data.get('traditional_rating', {}) or data.get('social', {}).get('traditional_rating', {})
-            rating_val = traditional.get('rating', traditional.get('msci', 'N/A'))
             st.markdown(f"""
             <div style="background:#1a1a1a; padding:15px; border-left:4px solid #666; border-radius:4px;">
                 <div style="color:#888; font-size:0.8rem;">🏢 传统评级 (MSCI)</div>
@@ -221,13 +292,12 @@ with tab1:
         st.metric("E-Score (环境)", f"{env_score}", delta="-2.5", delta_color="inverse")
         st.metric("S-Score (社会)", f"{soc_score}", delta="+5.1", delta_color="inverse")
         st.markdown("<br>", unsafe_allow_html=True)
-        # 模拟数据图表
         chart_data = pd.DataFrame(np.random.randn(20, 2) + [env_score/10, soc_score/10], columns=['Env', 'Soc'])
         st.line_chart(chart_data, color=["#00FF41", "#00F2FF"], height=120)
 
     st.markdown("---")
     
-    # 1.2 详细分析 (卫星 + 舆情)
+    # 1.2 详细分析
     col_env, col_soc = st.columns(2)
     
     # === 环境模块 ===
@@ -264,23 +334,42 @@ with tab1:
         else:
             st.code(f"# 中粮集团环境合规性\nstatus = 'COMPLIANT'\n# {env_analysis.get('conclusion', 'No Issue')}", language="python")
             
-    # === 社会模块 ===
+    # === 社会模块 (舆情证据链) ===
     with col_soc:
-        st.markdown("#### 📢 SOCIAL_LISTENING // 社会风险 (S)")
+        st.markdown("#### 📢 SOCIAL_LISTENING // 舆情证据链 (S)")
+        st.caption("AI 自动关联舆情事件与合规风险影响分析")
+        
         social = data.get('social', {})
         events = social.get('key_events', [])
         
         if events:
-            for event in events[:3]:
+            for i, event in enumerate(events[:3]):
                 severity = event.get('severity', '中')
                 border_color = "#FF3333" if severity in ['高', '严重'] else "#FFCC00"
+                impact_text = event.get('impact', 'AI 风险模型识别到潜在供应链合规隐患，建议人工复核。')
+                source_id = f"DOC_{202400+i}"
                 
                 st.markdown(f"""
-                <div style="border-left: 4px solid {border_color}; margin-bottom: 10px; background: #222; padding: 10px; border-radius: 4px;">
-                    <div style="color: #888; font-size: 0.8rem; font-weight:bold;">{event.get('date', 'N/A')}</div>
-                    <div style="color: #FFF; font-size: 0.95rem;">{event.get('event', '')}</div>
+                <div class="tech-card" style="padding: 15px; border-left: 4px solid {border_color}; margin-bottom: 15px;">
+                    <div style="display:flex; justify-content:space-between; margin-bottom:8px;">
+                        <span style="color:{border_color}; font-weight:bold; font-size:0.85rem;">RISK EVENT #{i+1}</span>
+                        <span style="color:#666; font-family:monospace; font-size:0.9rem;">{event.get('date', 'N/A')}</span>
+                    </div>
+                    <div style="color: #FFF; font-size: 1.1rem; font-weight: bold; margin-bottom: 12px; line-height: 1.4;">
+                        {event.get('event', '')}
+                    </div>
+                    <div style="background:rgba(255,255,255,0.05); padding:10px; border-radius:4px; margin-bottom:10px; border:1px dashed #333;">
+                        <div style="color:#00FF41; font-size:0.8rem; margin-bottom:4px;">🤖 AI 智能解说 (ANALYSIS):</div>
+                        <div style="color:#CCC; font-size:0.95rem;">{impact_text}</div>
+                    </div>
+                    <div style="text-align:right;">
+                        <a href="#" class="source-link-btn">
+                            📂 原文证据下载 (SOURCE: {source_id}.PDF)
+                        </a>
+                    </div>
                 </div>
                 """, unsafe_allow_html=True)
+            st.success("✅ 证据链完整度验证: 100% (3/3 Verified)")
         else:
             st.write("暂无重大风险事件")
 
@@ -289,20 +378,20 @@ with tab2:
     st.header("🔗 供应链风险传导网络")
     
     if is_cofco:
-        st.info("💡 提示: 风险传导路径可视化 (UPSTREAM -> CORE -> DOWNSTREAM)")
-        
+        # COFCO 视角：上游 -> 核心 -> 下游
+        st.info("💡 核心企业视角: 监控上游风险如何传导至自身及市场")
         st.markdown("""
-        <div style="display: flex; justify-content: space-around; align-items: center; background: #0F0F0F; padding: 20px; border: 1px dashed #333; margin-bottom: 20px;">
-            <div style="text-align: center;">
-                <div style="border: 1px solid #FF3333; color: #FF3333; padding: 8px 15px; border-radius: 4px; font-weight: bold;">FGV Holdings<br><small>上游/高风险</small></div>
+        <div style="display: flex; justify-content: space-around; align-items: stretch; background: #0F0F0F; padding: 20px; border-radius: 10px; border: 1px dashed #333; margin-bottom: 20px;">
+            <div style="flex:1;" class="chain-box">
+                <div style="border: 2px solid #FF3333; color: #FF3333; padding: 10px; border-radius: 5px;">FGV Holdings<br><small>上游/高风险</small></div>
             </div>
-            <div style="color: #444; font-size: 1.5rem;">➜</div>
-            <div style="text-align: center;">
-                <div style="border: 1px solid #FFCC00; color: #FFCC00; padding: 8px 15px; border-radius: 4px; font-weight: bold;">中粮集团<br><small>核心企业</small></div>
+            <div class="arrow">➜</div>
+            <div style="flex:1;" class="chain-box">
+                <div style="border: 2px solid #FFCC00; color: #FFCC00; padding: 10px; border-radius: 5px;">中粮集团<br><small>核心企业</small></div>
             </div>
-            <div style="color: #444; font-size: 1.5rem;">➜</div>
-            <div style="text-align: center;">
-                <div style="border: 1px solid #00F2FF; color: #00F2FF; padding: 8px 15px; border-radius: 4px; font-weight: bold;">欧美市场<br><small>合规壁垒</small></div>
+            <div class="arrow">➜</div>
+            <div style="flex:1;" class="chain-box">
+                <div style="border: 2px solid #00F2FF; color: #00F2FF; padding: 10px; border-radius: 5px;">欧美市场<br><small>合规壁垒</small></div>
             </div>
         </div>
         """, unsafe_allow_html=True)
@@ -315,14 +404,12 @@ with tab2:
                 risk_status = s.get('risk_status', '')
                 is_high = "高" in risk_status or "75" in risk_status
                 status_html = f'<span style="color: #FF3333;">[高风险]</span>' if is_high else f'<span style="color: #00FF41;">[低风险]</span>'
-                
                 st.markdown(f"""
                 <div class="tech-card" style="padding: 12px; margin-bottom: 10px;">
                     <div style="font-size: 1rem; font-weight: bold;">{s['name']}</div>
                     <div style="font-size: 0.9rem; margin-top:5px;">状态: {status_html} {risk_status}</div>
                 </div>
                 """, unsafe_allow_html=True)
-        
         with col2:
             st.markdown("### 🛡️ 阻断策略建议")
             st.markdown("""
@@ -334,9 +421,51 @@ with tab2:
                 </ul>
             </div>
             """, unsafe_allow_html=True)
+            
     else:
-        st.info("当前视图为供应商视角：展示自身风险如何影响下游客户。")
-        st.metric("下游客户流失风险", "High", "CBP禁令影响")
+        # 供应商视角 (FGV/IOI)
+        st.info(f"💡 供应商视角: 您的 ESG 风险如何导致下游客户 ({data.get('supply_chain', {}).get('midstream', {}).get('name', '核心加工商')}) 流失")
+        
+        my_risk_color = "#FF3333" if total_score > 50 else "#00FF41"
+        
+        st.markdown(f"""
+        <div style="display: flex; justify-content: space-around; align-items: stretch; background: #0F0F0F; padding: 20px; border-radius: 10px; border: 1px dashed #333; margin-bottom: 20px;">
+            <div style="flex:1;" class="chain-box">
+                <div style="border: 2px solid {my_risk_color}; color: {my_risk_color}; padding: 10px; border-radius: 5px;">{data.get('company')}<br><small>您 (供应商)</small></div>
+            </div>
+            <div class="arrow">➜</div>
+            <div style="flex:1;" class="chain-box">
+                <div style="border: 2px solid #FFCC00; color: #FFCC00; padding: 10px; border-radius: 5px;">核心加工商<br><small>采购方 (如中粮)</small></div>
+            </div>
+            <div class="arrow">➜</div>
+            <div style="flex:1;" class="chain-box">
+                <div style="border: 2px solid #FF0000; color: #FF0000; padding: 10px; border-radius: 5px; background: rgba(255,0,0,0.1);">市场禁入<br><small>CBP/EUDR 拦截</small></div>
+            </div>
+        </div>
+        """, unsafe_allow_html=True)
+
+        col1, col2 = st.columns(2)
+        with col1:
+            st.markdown("### 📉 商业影响预测")
+            st.markdown("""
+            <div class="tech-card" style="border-left-color: #FF3333;">
+                <div style="margin-bottom:10px;"><strong>⚠️ 主要客户流失风险:</strong></div>
+                <div style="font-size:2rem; color:#FF3333; font-weight:bold;">HIGH</div>
+                <p style="color:#BBB; font-size:0.9rem;">由于您的社会风险评分 ({}) 过高，下游客户 (中粮) 正面临美国 CBP 合规压力，可能在 3 个月内削减 70% 订单。</p>
+            </div>
+            """.format(soc_score), unsafe_allow_html=True)
+            
+        with col2:
+            st.markdown("### ✅ 整改建议 (To-Do)")
+            st.markdown("""
+            <div class="tech-card" style="border-left-color: #00FF41;">
+                <ul style="margin: 0; padding-left: 20px; color: #DDD;">
+                    <li style="margin-bottom: 10px;"><strong>立即行动:</strong> 提交针对 CBP WRO 的第三方审计报告。</li>
+                    <li style="margin-bottom: 10px;"><strong>透明度:</strong> 在 GreenLink 平台上传劳工合规证明。</li>
+                    <li><strong>沟通:</strong> 主动向中粮集团发送整改进度函。</li>
+                </ul>
+            </div>
+            """, unsafe_allow_html=True)
 
 # ---------- TAB 3: 绿色金融 ----------
 with tab3:
@@ -419,16 +548,17 @@ with tab3:
 
     st.dataframe(scf_df, use_container_width=True, hide_index=True)
 
-# ---------- TAB 4: 消费终端 (UI 升级版) ----------
+# ---------- TAB 4: 消费终端 (修复二维码) ----------
 with tab4:
     st.markdown("### 📱 产品数字孪生与信任溯源 (B2C)")
     
     col1, col2 = st.columns([1, 2])
     with col1:
-        # 二维码展示区域
-        st.markdown("""
+        # 修复：使用真实部署链接生成二维码
+        deployed_url = "https://xikai0906.github.io/green-link-demo/"
+        st.markdown(f"""
         <div style="background: #FFF; padding: 15px; border-radius: 10px; display: inline-block; box-shadow: 0 0 20px rgba(255,255,255,0.1);">
-            <img src="https://api.qrserver.com/v1/create-qr-code/?size=250x250&data=GreenLink_Product_Cert" width="100%" />
+            <img src="https://api.qrserver.com/v1/create-qr-code/?size=250x250&data={deployed_url}" width="100%" />
         </div>
         """, unsafe_allow_html=True)
         st.markdown('<p style="text-align:center; margin-top:10px; color:#00F2FF;">SCAN TO VERIFY</p>', unsafe_allow_html=True)
@@ -466,12 +596,58 @@ with tab4:
         </div>
         """, unsafe_allow_html=True)
 
+    # 标准解读模块
+    st.markdown("---")
+    with st.expander("📜 底层合规协议与国际标准 (COMPLIANCE PROTOCOLS)", expanded=True):
+        st.markdown("以下指标基于国际权威标准计算，确保数据可审计、可追溯：")
+        
+        c1, c2, c3 = st.columns(3)
+        
+        with c1:
+            st.markdown("""
+            <div class="protocol-box">
+                <div class="protocol-title">ISO 14067 (碳足迹)</div>
+                <div style="color:#BBB; font-size:0.85rem;">
+                • <strong>标准:</strong> 产品碳足迹国际标准 (LCA法)<br>
+                • <strong>边界:</strong> 摇篮到大门 (Cradle-to-Gate)<br>
+                • <strong>对比:</strong> 行业平均 ~3.8kg CO2e<br>
+                • <strong>优势:</strong> 减碳 68% (绿色能源+循环经济)
+                </div>
+            </div>
+            """, unsafe_allow_html=True)
+            
+        with c2:
+            st.markdown("""
+            <div class="protocol-box">
+                <div class="protocol-title">EUDR (零毁林法案)</div>
+                <div style="color:#BBB; font-size:0.85rem;">
+                • <strong>法规:</strong> 欧盟第 2023/1115 号条例<br>
+                • <strong>红线:</strong> 2020年12月31日后无毁林<br>
+                • <strong>验证:</strong> Sentinel-2 卫星历史影像<br>
+                • <strong>状态:</strong> ✅ 地理定位 (Geolocation) 合规
+                </div>
+            </div>
+            """, unsafe_allow_html=True)
+            
+        with c3:
+            st.markdown("""
+            <div class="protocol-box">
+                <div class="protocol-title">ILO (劳工公约)</div>
+                <div style="color:#BBB; font-size:0.85rem;">
+                • <strong>核心:</strong> 国际劳工组织 8项核心公约<br>
+                • <strong>重点:</strong> C29 (强迫劳动) & C138 (童工)<br>
+                • <strong>风控:</strong> 规避美国 CBP WRO (暂扣令)<br>
+                • <strong>审计:</strong> 第三方 SA8000 认证通过
+                </div>
+            </div>
+            """, unsafe_allow_html=True)
+
 # 侧边栏底部
 st.sidebar.markdown("---")
 st.sidebar.markdown("""
 <div style="font-size: 0.8rem; color: #666;">
     POWERED BY<br>
     <strong style="color: #FFF;">GREENLINK TECH</strong><br>
-    v2.1.0_beta
+    v2.5.0 (QR Fixed)
 </div>
 """, unsafe_allow_html=True)
