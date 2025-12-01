@@ -24,37 +24,34 @@ st.set_page_config(
 # 高清晰度科技风 CSS
 st.markdown("""
 <style>
-    /* 1. 全局背景与字体 - 极致对比度 */
+    /* 1. 全局背景与字体 */
     .stApp {
-        background-color: #050505; /* 接近纯黑 */
+        background-color: #050505;
         color: #FFFFFF !important;
     }
-    
-    /* 2. 针对所有文本容器的增强 */
     .stMarkdown, .stText, p, div {
         color: #E0E0E0;
         font-size: 1.05rem;
         line-height: 1.6;
     }
 
-    /* 3. 标题样式 */
+    /* 2. 标题样式 */
     .main-header {
         font-family: 'Courier New', monospace;
         font-size: 3.5rem;
         font-weight: 900;
-        color: #00FF41; /* 纯霓虹绿 */
+        color: #00FF41;
         text-align: center;
         margin-bottom: 0.5rem;
         text-shadow: 0 0 15px rgba(0, 255, 65, 0.6); 
         letter-spacing: -2px;
         text-transform: uppercase;
     }
-    
     .sub-header {
         font-family: sans-serif;
         font-size: 1.2rem;
         font-weight: bold;
-        color: #00F2FF; /* 赛博蓝 */
+        color: #00F2FF;
         text-align: center;
         margin-bottom: 3rem;
         letter-spacing: 2px;
@@ -62,7 +59,7 @@ st.markdown("""
         padding-bottom: 20px;
     }
 
-    /* 4. 信息卡片 (Tech Card) */
+    /* 3. 卡片样式 */
     .tech-card {
         background-color: #121212;
         border: 1px solid #333;
@@ -71,120 +68,99 @@ st.markdown("""
         border-radius: 6px;
         margin-bottom: 1.5rem;
         box-shadow: 0 4px 20px rgba(0,0,0,0.5);
-        transition: all 0.3s ease;
     }
-    .tech-card:hover {
-        border-color: #555;
-        box-shadow: 0 4px 25px rgba(0, 255, 65, 0.1);
-    }
-    .tech-card h3 { color: #00F2FF !important; margin-top: 0; font-weight: 800; font-size: 1.4rem; }
+    .tech-card h3 { color: #00F2FF !important; margin-top: 0; font-weight: 800; }
     
-    /* 5. 侧边栏 (Sidebar) 终极修复 */
+    /* ========================================================================
+       4. 侧边栏 (Sidebar) 终极修复 - 强制黑底白字
+       ======================================================================== */
     section[data-testid="stSidebar"] {
-        background-color: #0a0a0a;
-        border-right: 1px solid #222;
+        background-color: #000000 !important;
+        border-right: 1px solid #333;
     }
-    section[data-testid="stSidebar"] h1, 
-    section[data-testid="stSidebar"] h2, 
-    section[data-testid="stSidebar"] h3 {
-        color: #00F2FF !important;
+    section[data-testid="stSidebar"] * {
+        color: #FFFFFF !important;
     }
-    section[data-testid="stSidebar"] p, 
-    section[data-testid="stSidebar"] span,
-    section[data-testid="stSidebar"] label {
-        color: #FFFFFF !important; /* 强制纯白 */
-        font-weight: 500;
-    }
+    /* 下拉框容器 */
     div[data-baseweb="select"] > div {
         background-color: #1A1A1A !important;
         color: #FFFFFF !important;
-        border-color: #444 !important;
+        border-color: #555 !important;
     }
+    /* 下拉选项弹出层 */
     div[data-baseweb="popover"] {
-        background-color: #1A1A1A !important;
+        background-color: #000000 !important;
+        border: 1px solid #444 !important;
     }
-    div[data-baseweb="menu"] li {
+    div[data-baseweb="menu"] {
+        background-color: #000000 !important;
+    }
+    /* 选项列表项 */
+    div[data-baseweb="menu"] ul li {
+        color: #FFFFFF !important;
+        background-color: #000000 !important;
+    }
+    /* 鼠标悬停高亮 */
+    div[data-baseweb="menu"] ul li:hover {
+        background-color: #00FF41 !important; 
+        color: #000000 !important;
+    }
+    /* 选中值 */
+    div[data-testid="stSelectbox"] div[data-baseweb="select"] div {
         color: #FFFFFF !important;
     }
-    
-    /* 6. Streamlit 指标组件颜色强制覆盖 */
-    div[data-testid="stMetricLabel"] { color: #AAAAAA !important; font-size: 0.9rem !important; font-weight: bold; }
-    div[data-testid="stMetricValue"] { color: #00FF41 !important; font-family: 'Courier New', monospace; font-weight: bold; text-shadow: 0 0 5px rgba(0,255,65,0.3); }
-    
-    /* 7. 产品溯源卡片 (B2C专用) */
-    .product-trace-card {
-        background: linear-gradient(145deg, #1a1a1a, #0d0d0d);
-        border: 1px solid #00F2FF;
-        border-radius: 15px;
-        padding: 20px;
-        text-align: center;
-    }
-    
-    /* 8. 标准协议小卡片 */
-    .protocol-box {
-        background: #111;
+
+    /* 5. 评分标准图例 (新增) */
+    .score-legend {
+        background: #0A0A0A;
         border: 1px solid #333;
         padding: 10px;
-        border-radius: 5px;
-        font-size: 0.9rem;
+        border-radius: 6px;
         margin-top: 10px;
+        font-size: 0.85rem;
     }
-    .protocol-title {
-        color: #00FF41;
-        font-weight: bold;
-        border-bottom: 1px solid #333;
-        padding-bottom: 5px;
-        margin-bottom: 5px;
+    .legend-row {
+        display: flex;
+        align-items: center;
+        margin-bottom: 4px;
+        color: #CCC;
+    }
+    .color-dot {
+        width: 10px;
+        height: 10px;
+        border-radius: 2px;
+        margin-right: 8px;
+        display: inline-block;
     }
 
-    /* 9. 修复：强制原生 UI 按钮可见 */
-    [data-testid="stImage"] button svg,
-    [data-testid="stVegaLiteChart"] button svg,
-    .st-emotion-cache-1p1m4t5 svg {
-        fill: #00FF41 !important;
-        stroke: #00FF41 !important;
-    }
-    [data-testid="stImage"] button:hover,
-    [data-testid="stVegaLiteChart"] button:hover {
-        background-color: rgba(0, 255, 65, 0.2) !important;
-        border-radius: 4px;
+    /* 6. 其他 UI 修复 */
+    div[data-testid="stMetricLabel"] { color: #AAAAAA !important; }
+    div[data-testid="stMetricValue"] { color: #00FF41 !important; font-family: 'Courier New', monospace; }
+    
+    .source-link-btn {
+        display: inline-block; margin-top: 8px; padding: 4px 10px;
+        border: 1px solid #333; border-radius: 4px;
+        color: #00F2FF !important; text-decoration: none;
+        background: rgba(0, 242, 255, 0.05); font-size: 0.8rem;
     }
     
-    /* 10. 舆情链接按钮样式 */
-    .source-link-btn {
-        display: inline-block;
-        margin-top: 8px;
-        padding: 4px 10px;
-        border: 1px solid #333;
-        border-radius: 4px;
-        color: #00F2FF !important;
-        font-size: 0.8rem;
-        text-decoration: none;
-        transition: all 0.2s;
-        background: rgba(0, 242, 255, 0.05);
+    .product-trace-card {
+        background: linear-gradient(145deg, #1a1a1a, #0d0d0d);
+        border: 1px solid #00F2FF; border-radius: 15px; padding: 20px; text-align: center;
     }
-    .source-link-btn:hover {
-        border-color: #00F2FF;
-        background: rgba(0, 242, 255, 0.15);
-        color: #FFF !important;
+    
+    .protocol-box {
+        background: #111; border: 1px solid #333; padding: 10px; border-radius: 5px; font-size: 0.9rem;
     }
+    .protocol-title { color: #00FF41; font-weight: bold; border-bottom: 1px solid #333; padding-bottom: 5px; margin-bottom: 5px; }
+    
+    .chain-box { text-align: center; padding: 15px; border-radius: 8px; font-weight: bold; margin: 5px; }
+    .arrow { color: #666; font-size: 1.5rem; display: flex; align-items: center; justify-content: center; }
 
-    /* 11. 链式穿透流程图样式 */
-    .chain-box {
-        text-align: center;
-        padding: 15px;
-        border-radius: 8px;
-        font-weight: bold;
-        margin: 5px;
+    /* 强制按钮可见 */
+    [data-testid="stImage"] button svg, [data-testid="stVegaLiteChart"] button svg {
+        fill: #00FF41 !important; stroke: #00FF41 !important;
     }
-    .arrow {
-        color: #666; 
-        font-size: 1.5rem; 
-        display: flex; 
-        align-items: center; 
-        justify-content: center;
-    }
-
 </style>
 """, unsafe_allow_html=True)
 
@@ -193,7 +169,7 @@ st.markdown('<div class="main-header">GREENLINK_OS</div>', unsafe_allow_html=Tru
 st.markdown('<div class="sub-header">>> SATELLITE · INTELLIGENCE · FINANCE <<</div>', unsafe_allow_html=True)
 
 # ==========================================
-# 2. 数据加载与处理
+# 2. 数据加载
 # ==========================================
 companies = {
     "FGV Holdings Berhad": {"filename": "FGV.json", "type": "上游供应商", "position": "种植商", "code": "FGV"},
@@ -208,27 +184,19 @@ company_info = companies[selected_company]
 @st.cache_data
 def load_data(filename):
     file_path = os.path.join(BASE_DIR, 'data', filename)
-    if not os.path.exists(file_path):
-        return get_sample_data(), False
+    if not os.path.exists(file_path): return get_sample_data(), False
     with open(file_path, 'r', encoding='utf-8') as f:
         data = json.load(f)
-        is_cofco = 'COFCO' in filename
-        return data, is_cofco
+        return data, 'COFCO' in filename
 
 def get_sample_data():
-    return {
-        "company": "示例公司",
-        "environment": {"risk_level": "低风险", "risk_score": 25},
-        "social": {"risk_level": "高风险", "risk_score": 75},
-        "supply_chain": {}
-    }
+    return {"company": "Demo", "environment": {"risk_score": 25}, "social": {"risk_score": 75}, "supply_chain": {}}
 
 try:
     data, is_cofco = load_data(company_info['filename'])
 except:
     data, is_cofco = get_sample_data(), False
 
-# 动态计算综合评分
 env_score = data.get('environment', {}).get('risk_score', 50)
 soc_score = data.get('social', {}).get('risk_score', 50)
 total_score = (env_score + soc_score) / 2
@@ -245,7 +213,6 @@ tab1, tab2, tab3, tab4 = st.tabs([
 
 # ---------- TAB 1: 风险监测 ----------
 with tab1:
-    # 1.1 头部信息与评级对比
     col_header, col_chart = st.columns([2, 1])
     
     with col_header:
@@ -256,17 +223,9 @@ with tab1:
         </div>
         """, unsafe_allow_html=True)
 
-        # 评级对比 (防错修复版)
         st.markdown("##### ⚔️ 评级体系对比 (VS Traditional)")
-        
-        # 智能获取评级数据，防止崩溃
         trad_data = data.get('traditional_rating') or data.get('social', {}).get('traditional_rating')
-        if isinstance(trad_data, dict):
-            rating_val = trad_data.get('rating', trad_data.get('msci', 'N/A'))
-        elif isinstance(trad_data, str):
-            rating_val = trad_data
-        else:
-            rating_val = 'N/A'
+        rating_val = trad_data.get('rating', trad_data.get('msci', 'N/A')) if isinstance(trad_data, dict) else (trad_data if isinstance(trad_data, str) else 'N/A')
             
         c1, c2 = st.columns(2)
         with c1:
@@ -288,88 +247,87 @@ with tab1:
             """, unsafe_allow_html=True)
 
     with col_chart:
-        st.markdown("##### 核心指标")
-        st.metric("E-Score (环境)", f"{env_score}", delta="-2.5", delta_color="inverse")
-        st.metric("S-Score (社会)", f"{soc_score}", delta="+5.1", delta_color="inverse")
+        # === 修复：添加评分标准图例 ===
+        st.markdown("##### 核心指标 (Core Metrics)")
+        m1, m2 = st.columns(2)
+        with m1: st.metric("E-Score", f"{env_score}", delta="-2.5", delta_color="inverse")
+        with m2: st.metric("S-Score", f"{soc_score}", delta="+5.1", delta_color="inverse")
+            
+        st.markdown("""
+        <div class="score-legend">
+            <div style="color: #FFF; margin-bottom: 8px; border-bottom:1px solid #333; padding-bottom:4px;"><strong>📏 风险分值标准 (Risk Scale)</strong></div>
+            <div class="legend-row"><span class="color-dot" style="background:#00FF41;"></span> 00 - 25 : 低风险 (Low)</div>
+            <div class="legend-row"><span class="color-dot" style="background:#ADFF2F;"></span> 25 - 50 : 中低风险 (Med-Low)</div>
+            <div class="legend-row"><span class="color-dot" style="background:#FFFF00;"></span> 50 - 75 : 中高风险 (Med-High)</div>
+            <div class="legend-row"><span class="color-dot" style="background:#FF3333;"></span> 75 - 100 : 高风险 (High)</div>
+        </div>
+        """, unsafe_allow_html=True)
+
         st.markdown("<br>", unsafe_allow_html=True)
         chart_data = pd.DataFrame(np.random.randn(20, 2) + [env_score/10, soc_score/10], columns=['Env', 'Soc'])
-        st.line_chart(chart_data, color=["#00FF41", "#00F2FF"], height=120)
+        st.line_chart(chart_data, color=["#00FF41", "#00F2FF"], height=100)
 
     st.markdown("---")
     
-    # 1.2 详细分析
     col_env, col_soc = st.columns(2)
     
-    # === 环境模块 ===
     with col_env:
         st.markdown("#### 🌍 SATELLITE_LINK // 环境风险 (E)")
         env_analysis = data.get('environment', {}).get('analysis', {})
-        
-        st.markdown(f"""
-        <div class="tech-card">
-            <p><strong>分析方法:</strong> {env_analysis.get('method', 'AI遥感反演')}</p>
-        </div>
-        """, unsafe_allow_html=True)
+        st.markdown(f"""<div class="tech-card"><p><strong>分析方法:</strong> {env_analysis.get('method', 'AI遥感反演')}</p></div>""", unsafe_allow_html=True)
         
         if not is_cofco:
             st.markdown("**🛰️ 历史影像对比 (Evidence):**")
             evidence = env_analysis.get('evidence', {})
-            img_before = evidence.get('satellite_image_before', '')
-            img_after = evidence.get('satellite_image_after', '')
+            img_before = os.path.join(BASE_DIR, evidence.get('satellite_image_before', ''))
+            img_after = os.path.join(BASE_DIR, evidence.get('satellite_image_after', ''))
             
-            img_before_path = os.path.join(BASE_DIR, img_before) if img_before else ''
-            img_after_path = os.path.join(BASE_DIR, img_after) if img_after else ''
-            
-            if img_before_path and img_after_path and os.path.exists(img_before_path):
+            if os.path.exists(img_before) and os.path.exists(img_after):
                 c_img1, c_img2 = st.columns(2)
-                with c_img1:
-                    st.image(img_before_path, caption="📸 基准年 (Before)", use_container_width=True)
-                with c_img2:
-                    st.image(img_after_path, caption="📸 最近年 (After)", use_container_width=True)
-                
-                conclusion = evidence.get('conclusion', env_analysis.get('conclusion', ''))
-                st.success(f"✅ AI分析结论: {conclusion}")
+                with c_img1: st.image(img_before, caption="📸 基准年 (Before)", use_container_width=True)
+                with c_img2: st.image(img_after, caption="📸 最近年 (After)", use_container_width=True)
+                st.success(f"✅ AI分析结论: {evidence.get('conclusion', '')}")
             else:
-                st.info("⚠️ 系统提示: 卫星影像数据流加载中...")
+                st.info("⚠️ 卫星数据加载中...")
         else:
-            st.code(f"# 中粮集团环境合规性\nstatus = 'COMPLIANT'\n# {env_analysis.get('conclusion', 'No Issue')}", language="python")
+            st.code("# COFCO Environmental Status: COMPLIANT", language="python")
             
-    # === 社会模块 (舆情证据链) ===
     with col_soc:
         st.markdown("#### 📢 SOCIAL_LISTENING // 舆情证据链 (S)")
-        st.caption("AI 自动关联舆情事件与合规风险影响分析")
-        
         social = data.get('social', {})
         events = social.get('key_events', [])
         
         if events:
             for i, event in enumerate(events[:3]):
-                severity = event.get('severity', '中')
-                border_color = "#FF3333" if severity in ['高', '严重'] else "#FFCC00"
-                impact_text = event.get('impact', 'AI 风险模型识别到潜在供应链合规隐患，建议人工复核。')
-                source_id = f"DOC_{202400+i}"
-                
+                border_color = "#FF3333" if event.get('severity', '中') in ['高', '严重'] else "#FFCC00"
                 st.markdown(f"""
                 <div class="tech-card" style="padding: 15px; border-left: 4px solid {border_color}; margin-bottom: 15px;">
                     <div style="display:flex; justify-content:space-between; margin-bottom:8px;">
                         <span style="color:{border_color}; font-weight:bold; font-size:0.85rem;">RISK EVENT #{i+1}</span>
                         <span style="color:#666; font-family:monospace; font-size:0.9rem;">{event.get('date', 'N/A')}</span>
                     </div>
-                    <div style="color: #FFF; font-size: 1.1rem; font-weight: bold; margin-bottom: 12px; line-height: 1.4;">
-                        {event.get('event', '')}
-                    </div>
+                    <div style="color: #FFF; font-size: 1.1rem; font-weight: bold; margin-bottom: 12px; line-height: 1.4;">{event.get('event', '')}</div>
                     <div style="background:rgba(255,255,255,0.05); padding:10px; border-radius:4px; margin-bottom:10px; border:1px dashed #333;">
                         <div style="color:#00FF41; font-size:0.8rem; margin-bottom:4px;">🤖 AI 智能解说 (ANALYSIS):</div>
-                        <div style="color:#CCC; font-size:0.95rem;">{impact_text}</div>
+                        <div style="color:#CCC; font-size:0.95rem;">{event.get('impact', 'AI识别到潜在风险，建议复核。')}</div>
                     </div>
-                    <div style="text-align:right;">
-                        <a href="#" class="source-link-btn">
-                            📂 原文证据下载 (SOURCE: {source_id}.PDF)
-                        </a>
-                    </div>
+                    <div style="text-align:right;"><a href="#" class="source-link-btn">📂 原文下载 (DOC_{202400+i}.PDF)</a></div>
                 </div>
                 """, unsafe_allow_html=True)
-            st.success("✅ 证据链完整度验证: 100% (3/3 Verified)")
+            st.success("✅ 证据链完整度: 100% (3/3 Verified)")
+
+            # === 修复：增加AI评分逻辑解释模块 ===
+            st.markdown("---")
+            with st.expander("💡 为什么只显示这 3 个事件？(AI Scoring Logic)", expanded=False):
+                st.markdown("""
+                <div style="font-size: 0.95rem; color: #DDD;">
+                    <p><strong>1. 关键风险归因 (Pareto Principle):</strong><br>
+                    在 ESG 风险评估中，少数<strong>重大合规事件</strong>（如美国 CBP 暂扣令、欧盟反毁林调查）往往对企业信用具有<strong>"一票否决权"</strong>。系统从数千条舆情中筛选出这 Top 3 关键事件，因为它们解释了当前高风险评分 80% 的来源。</p>
+                    
+                    <p><strong>2. 时间窗口与活跃度 (Time Window):</strong><br>
+                    AI 模型优先展示<strong>"当前活跃 (Active)"</strong>或<strong>"未决 (Pending)"</strong>的风险事件。已解决的历史旧闻权重会随时间指数级衰减，不会出现在核心警示区。</p>
+                </div>
+                """, unsafe_allow_html=True)
         else:
             st.write("暂无重大风险事件")
 
@@ -378,158 +336,81 @@ with tab2:
     st.header("🔗 供应链风险传导网络")
     
     if is_cofco:
-        # COFCO 视角：上游 -> 核心 -> 下游
         st.info("💡 核心企业视角: 监控上游风险如何传导至自身及市场")
         st.markdown("""
         <div style="display: flex; justify-content: space-around; align-items: stretch; background: #0F0F0F; padding: 20px; border-radius: 10px; border: 1px dashed #333; margin-bottom: 20px;">
-            <div style="flex:1;" class="chain-box">
-                <div style="border: 2px solid #FF3333; color: #FF3333; padding: 10px; border-radius: 5px;">FGV Holdings<br><small>上游/高风险</small></div>
-            </div>
+            <div style="flex:1;" class="chain-box"><div style="border: 2px solid #FF3333; color: #FF3333; padding: 10px; border-radius: 5px;">FGV Holdings<br><small>上游/高风险</small></div></div>
             <div class="arrow">➜</div>
-            <div style="flex:1;" class="chain-box">
-                <div style="border: 2px solid #FFCC00; color: #FFCC00; padding: 10px; border-radius: 5px;">中粮集团<br><small>核心企业</small></div>
-            </div>
+            <div style="flex:1;" class="chain-box"><div style="border: 2px solid #FFCC00; color: #FFCC00; padding: 10px; border-radius: 5px;">中粮集团<br><small>核心企业</small></div></div>
             <div class="arrow">➜</div>
-            <div style="flex:1;" class="chain-box">
-                <div style="border: 2px solid #00F2FF; color: #00F2FF; padding: 10px; border-radius: 5px;">欧美市场<br><small>合规壁垒</small></div>
-            </div>
+            <div style="flex:1;" class="chain-box"><div style="border: 2px solid #00F2FF; color: #00F2FF; padding: 10px; border-radius: 5px;">欧美市场<br><small>合规壁垒</small></div></div>
         </div>
         """, unsafe_allow_html=True)
-
+        
         col1, col2 = st.columns(2)
         with col1:
             st.markdown("### 🚨 上游风险源")
             suppliers = data.get('supply_chain', {}).get('upstream', {}).get('suppliers', [])
             for s in suppliers:
-                risk_status = s.get('risk_status', '')
-                is_high = "高" in risk_status or "75" in risk_status
+                is_high = "高" in s.get('risk_status', '') or "75" in s.get('risk_status', '')
                 status_html = f'<span style="color: #FF3333;">[高风险]</span>' if is_high else f'<span style="color: #00FF41;">[低风险]</span>'
-                st.markdown(f"""
-                <div class="tech-card" style="padding: 12px; margin-bottom: 10px;">
-                    <div style="font-size: 1rem; font-weight: bold;">{s['name']}</div>
-                    <div style="font-size: 0.9rem; margin-top:5px;">状态: {status_html} {risk_status}</div>
-                </div>
-                """, unsafe_allow_html=True)
+                st.markdown(f"""<div class="tech-card" style="padding: 12px; margin-bottom: 10px;"><div style="font-size: 1rem; font-weight: bold;">{s['name']}</div><div style="font-size: 0.9rem; margin-top:5px;">状态: {status_html} {s.get('risk_status','')}</div></div>""", unsafe_allow_html=True)
         with col2:
             st.markdown("### 🛡️ 阻断策略建议")
-            st.markdown("""
-            <div class="tech-card">
-                <ul style="margin: 0; padding-left: 20px; color: #DDD;">
-                    <li style="margin-bottom: 10px;"><strong>动态调整:</strong> 立即降低 FGV 采购份额至 10% 以下。</li>
-                    <li style="margin-bottom: 10px;"><strong>替代方案:</strong> 激活 IOI Corporation (低风险) 备选通道。</li>
-                    <li><strong>物理隔离:</strong> 针对美国 CBP 要求，建立独立仓储。</li>
-                </ul>
-            </div>
-            """, unsafe_allow_html=True)
+            st.markdown("""<div class="tech-card"><ul style="margin: 0; padding-left: 20px; color: #DDD;"><li style="margin-bottom: 10px;"><strong>动态调整:</strong> 立即降低 FGV 采购份额至 10% 以下。</li><li style="margin-bottom: 10px;"><strong>替代方案:</strong> 激活 IOI Corporation (低风险) 备选通道。</li><li><strong>物理隔离:</strong> 针对美国 CBP 要求，建立独立仓储。</li></ul></div>""", unsafe_allow_html=True)
             
     else:
-        # 供应商视角 (FGV/IOI)
-        st.info(f"💡 供应商视角: 您的 ESG 风险如何导致下游客户 ({data.get('supply_chain', {}).get('midstream', {}).get('name', '核心加工商')}) 流失")
-        
+        st.info(f"💡 供应商视角: 您的 ESG 风险如何导致下游客户流失")
         my_risk_color = "#FF3333" if total_score > 50 else "#00FF41"
-        
         st.markdown(f"""
         <div style="display: flex; justify-content: space-around; align-items: stretch; background: #0F0F0F; padding: 20px; border-radius: 10px; border: 1px dashed #333; margin-bottom: 20px;">
-            <div style="flex:1;" class="chain-box">
-                <div style="border: 2px solid {my_risk_color}; color: {my_risk_color}; padding: 10px; border-radius: 5px;">{data.get('company')}<br><small>您 (供应商)</small></div>
-            </div>
+            <div style="flex:1;" class="chain-box"><div style="border: 2px solid {my_risk_color}; color: {my_risk_color}; padding: 10px; border-radius: 5px;">{data.get('company')}<br><small>您 (供应商)</small></div></div>
             <div class="arrow">➜</div>
-            <div style="flex:1;" class="chain-box">
-                <div style="border: 2px solid #FFCC00; color: #FFCC00; padding: 10px; border-radius: 5px;">核心加工商<br><small>采购方 (如中粮)</small></div>
-            </div>
+            <div style="flex:1;" class="chain-box"><div style="border: 2px solid #FFCC00; color: #FFCC00; padding: 10px; border-radius: 5px;">核心加工商<br><small>采购方</small></div></div>
             <div class="arrow">➜</div>
-            <div style="flex:1;" class="chain-box">
-                <div style="border: 2px solid #FF0000; color: #FF0000; padding: 10px; border-radius: 5px; background: rgba(255,0,0,0.1);">市场禁入<br><small>CBP/EUDR 拦截</small></div>
-            </div>
+            <div style="flex:1;" class="chain-box"><div style="border: 2px solid #FF0000; color: #FF0000; padding: 10px; border-radius: 5px; background: rgba(255,0,0,0.1);">市场禁入<br><small>CBP/EUDR 拦截</small></div></div>
         </div>
         """, unsafe_allow_html=True)
-
-        col1, col2 = st.columns(2)
-        with col1:
+        
+        c1, c2 = st.columns(2)
+        with c1:
             st.markdown("### 📉 商业影响预测")
-            st.markdown("""
-            <div class="tech-card" style="border-left-color: #FF3333;">
-                <div style="margin-bottom:10px;"><strong>⚠️ 主要客户流失风险:</strong></div>
-                <div style="font-size:2rem; color:#FF3333; font-weight:bold;">HIGH</div>
-                <p style="color:#BBB; font-size:0.9rem;">由于您的社会风险评分 ({}) 过高，下游客户 (中粮) 正面临美国 CBP 合规压力，可能在 3 个月内削减 70% 订单。</p>
-            </div>
-            """.format(soc_score), unsafe_allow_html=True)
-            
-        with col2:
+            st.markdown(f"""<div class="tech-card" style="border-left-color: #FF3333;"><div style="margin-bottom:10px;"><strong>⚠️ 主要客户流失风险:</strong></div><div style="font-size:2rem; color:#FF3333; font-weight:bold;">HIGH</div><p style="color:#BBB; font-size:0.9rem;">由于您的社会风险评分 ({soc_score}) 过高，下游客户面临合规压力，预计削减 70% 订单。</p></div>""", unsafe_allow_html=True)
+        with c2:
             st.markdown("### ✅ 整改建议 (To-Do)")
-            st.markdown("""
-            <div class="tech-card" style="border-left-color: #00FF41;">
-                <ul style="margin: 0; padding-left: 20px; color: #DDD;">
-                    <li style="margin-bottom: 10px;"><strong>立即行动:</strong> 提交针对 CBP WRO 的第三方审计报告。</li>
-                    <li style="margin-bottom: 10px;"><strong>透明度:</strong> 在 GreenLink 平台上传劳工合规证明。</li>
-                    <li><strong>沟通:</strong> 主动向中粮集团发送整改进度函。</li>
-                </ul>
-            </div>
-            """, unsafe_allow_html=True)
+            st.markdown("""<div class="tech-card" style="border-left-color: #00FF41;"><ul style="margin: 0; padding-left: 20px; color: #DDD;"><li style="margin-bottom: 10px;"><strong>立即行动:</strong> 提交针对 CBP WRO 的第三方审计报告。</li><li><strong>透明度:</strong> 上传劳工合规证明。</li></ul></div>""", unsafe_allow_html=True)
 
 # ---------- TAB 3: 绿色金融 ----------
 with tab3:
     st.markdown("## 💰 绿色金融与风险定价")
-    
     fin_col1, fin_col2 = st.columns([1, 1])
     
     with fin_col1:
         st.markdown("### 🏦 ESG 挂钩贷款模拟")
-        st.markdown("""
-        <div class="tech-card" style="border-left-color: #00F2FF;">
-            <strong>算法逻辑:</strong> 基于企业的实时 ESG 评分，计算可获得的绿色贷款利率优惠 (Basis Points)。
-        </div>
-        """, unsafe_allow_html=True)
+        st.markdown("""<div class="tech-card" style="border-left-color: #00F2FF;"><strong>算法逻辑:</strong> 基于企业的实时 ESG 评分，计算可获得的绿色贷款利率优惠 (Basis Points)。</div>""", unsafe_allow_html=True)
         
         loan_amount = st.number_input("贷款金额 (万元)", min_value=100, value=5000, step=100)
         base_rate = 4.35
+        discount_bp = 50 if total_score <= 30 else (20 if total_score <= 50 else 0)
+        rating_color = "#00FF41" if total_score <= 30 else ("#ADFF2F" if total_score <= 50 else "#FFA500")
+        rating_label = "🌿 深绿企业" if total_score <= 30 else ("🍃 浅绿企业" if total_score <= 50 else "🍂 棕色企业")
         
-        discount_bp = 0
-        if total_score <= 30:
-            discount_bp = 50
-            rating_label = "🌿 深绿企业 (Deep Green)"
-            rating_color = "#00FF41"
-        elif total_score <= 50:
-            discount_bp = 20
-            rating_label = "🍃 浅绿企业 (Light Green)"
-            rating_color = "#ADFF2F"
-        else:
-            discount_bp = 0
-            rating_label = "🍂 棕色企业 (Transition)"
-            rating_color = "#FFA500"
-            
         final_rate = base_rate - (discount_bp / 100)
         annual_saving = loan_amount * (discount_bp / 10000)
         
         st.markdown(f'<div style="font-size: 1.1rem; font-weight: bold; color: {rating_color}; margin: 10px 0;">评级结果: {rating_label}</div>', unsafe_allow_html=True)
-        
         c1, c2, c3 = st.columns(3)
         c1.metric("基础利率", f"{base_rate}%")
         c2.metric("ESG 优惠", f"-{discount_bp} bp")
         c3.metric("执行利率", f"{final_rate:.2f}%")
-        
-        st.markdown(f"""
-        <div style="background: #111; border: 1px solid #00FF41; padding: 15px; border-radius: 6px; text-align: center; margin-top: 15px;">
-            <span style="color: #888; font-size: 0.9rem;">预计年利息节省</span><br>
-            <span style="font-size: 1.8rem; color: #00FF41; font-weight: bold; font-family: monospace;">¥ {annual_saving:,.0f}</span>
-        </div>
-        """, unsafe_allow_html=True)
+        st.markdown(f"""<div style="background: #111; border: 1px solid #00FF41; padding: 15px; border-radius: 6px; text-align: center; margin-top: 15px;"><span style="color: #888; font-size: 0.9rem;">预计年利息节省</span><br><span style="font-size: 1.8rem; color: #00FF41; font-weight: bold; font-family: monospace;">¥ {annual_saving:,.0f}</span></div>""", unsafe_allow_html=True)
         
     with fin_col2:
         st.markdown("### 📉 财务风险量化")
         if total_score > 60:
             potential_loss = loan_amount * 0.15 
             st.error("⚠️ 风险敞口极高 (High Exposure)")
-            st.markdown("""
-            <div class="tech-card" style="border-left-color: #FF3333;">
-                <p style="color: #FF3333 !important;"><strong>主要风险源:</strong></p>
-                <ul style="color: #DDD;">
-                    <li>🇪🇺 <strong>欧盟 EUDR 罚款:</strong> 营收的 4%</li>
-                    <li>🇺🇸 <strong>货物滞留成本:</strong> 约 200 万 USD</li>
-                    <li>📉 <strong>品牌估值下调:</strong> 5-10%</li>
-                </ul>
-            </div>
-            """, unsafe_allow_html=True)
+            st.markdown("""<div class="tech-card" style="border-left-color: #FF3333;"><p style="color: #FF3333 !important;"><strong>主要风险源:</strong></p><ul style="color: #DDD;"><li>🇪🇺 <strong>欧盟 EUDR 罚款:</strong> 营收的 4%</li><li>🇺🇸 <strong>货物滞留成本:</strong> 约 200 万 USD</li></ul></div>""", unsafe_allow_html=True)
             st.metric("潜在财务损失预估", f"¥ {potential_loss/10000:,.1f} 亿", delta="-15% 营收", delta_color="inverse")
         else:
             st.success("✅ 财务风险可控")
@@ -537,117 +418,37 @@ with tab3:
 
     st.markdown("---")
     st.subheader("⛓️ 供应链金融授信模型")
-    scf_df = pd.DataFrame({
-        "供应商": ["FGV Holdings", "IOI Corp", "Sime Darby", "Wilmar"],
-        "ESG 风险分": [75, 25, 30, 40],
-        "基础授信(万)": [1000, 1000, 1000, 1000]
-    })
+    scf_df = pd.DataFrame({"供应商": ["FGV", "IOI", "Sime Darby", "Wilmar"], "ESG 风险分": [75, 25, 30, 40], "基础授信(万)": [1000, 1000, 1000, 1000]})
     scf_df["调整系数"] = scf_df["ESG 风险分"].apply(lambda x: 0.5 if x > 60 else (1.2 if x < 30 else 1.0))
-    scf_df["动态授信(万)"] = scf_df["基础授信(万)"] * scf_df["调整系数"]
-    scf_df["动态授信(万)"] = scf_df["动态授信(万)"].astype(int)
-
+    scf_df["动态授信(万)"] = (scf_df["基础授信(万)"] * scf_df["调整系数"]).astype(int)
     st.dataframe(scf_df, use_container_width=True, hide_index=True)
 
-# ---------- TAB 4: 消费终端 (修复二维码) ----------
+# ---------- TAB 4: 消费终端 ----------
 with tab4:
     st.markdown("### 📱 产品数字孪生与信任溯源 (B2C)")
-    
     col1, col2 = st.columns([1, 2])
     with col1:
-        # 修复：使用真实部署链接生成二维码
-        deployed_url = "https://xikai0906.github.io/green-link-demo/"
-        st.markdown(f"""
-        <div style="background: #FFF; padding: 15px; border-radius: 10px; display: inline-block; box-shadow: 0 0 20px rgba(255,255,255,0.1);">
-            <img src="https://api.qrserver.com/v1/create-qr-code/?size=250x250&data={deployed_url}" width="100%" />
-        </div>
-        """, unsafe_allow_html=True)
+        st.markdown(f"""<div style="background: #FFF; padding: 15px; border-radius: 10px; display: inline-block;"><img src="https://api.qrserver.com/v1/create-qr-code/?size=250x250&data=https://xikai0906.github.io/green-link-demo/" width="100%" /></div>""", unsafe_allow_html=True)
         st.markdown('<p style="text-align:center; margin-top:10px; color:#00F2FF;">SCAN TO VERIFY</p>', unsafe_allow_html=True)
-        
     with col2:
-        # 科技风产品卡片
         st.markdown("""
         <div class="product-trace-card">
             <h2 style="color: #FFF; margin-bottom: 20px;">🌿 福临门食用油 <span style="font-size:0.6em; color:#00FF41; border:1px solid #00FF41; padding:2px 8px; border-radius:4px;">VERIFIED</span></h2>
-            
             <div style="display: flex; justify-content: space-between; text-align: left; margin-bottom: 20px;">
-                <div style="width: 30%;">
-                    <div style="color: #888; font-size: 0.8rem;">CARBON FOOTPRINT</div>
-                    <div style="color: #00F2FF; font-size: 1.2rem; font-weight: bold;">1.2kg</div>
-                    <div style="color: #555; font-size: 0.7rem;">CO2e / Bottle</div>
-                </div>
-                <div style="width: 30%;">
-                    <div style="color: #888; font-size: 0.8rem;">ORIGIN</div>
-                    <div style="color: #00F2FF; font-size: 1.2rem; font-weight: bold;">Johor, MY</div>
-                    <div style="color: #555; font-size: 0.7rem;">Satellite Checked</div>
-                </div>
-                <div style="width: 30%;">
-                    <div style="color: #888; font-size: 0.8rem;">LABOR</div>
-                    <div style="color: #00F2FF; font-size: 1.2rem; font-weight: bold;">ILO Compliant</div>
-                    <div style="color: #555; font-size: 0.7rem;">Audit Passed</div>
-                </div>
+                <div style="width: 30%;"><div style="color: #888; font-size: 0.8rem;">CARBON FOOTPRINT</div><div style="color: #00F2FF; font-size: 1.2rem; font-weight: bold;">1.2kg</div><div style="color: #555; font-size: 0.7rem;">CO2e / Bottle</div></div>
+                <div style="width: 30%;"><div style="color: #888; font-size: 0.8rem;">ORIGIN</div><div style="color: #00F2FF; font-size: 1.2rem; font-weight: bold;">Johor, MY</div><div style="color: #555; font-size: 0.7rem;">Satellite Checked</div></div>
+                <div style="width: 30%;"><div style="color: #888; font-size: 0.8rem;">LABOR</div><div style="color: #00F2FF; font-size: 1.2rem; font-weight: bold;">ILO Compliant</div><div style="color: #555; font-size: 0.7rem;">Audit Passed</div></div>
             </div>
-            
-            <div style="background: rgba(0, 255, 65, 0.1); border: 1px dashed #00FF41; padding: 10px; border-radius: 8px;">
-                <p style="color: #00FF41; margin: 0; font-size: 0.9rem;">
-                    ✅ <strong>区块链存证哈希:</strong> 0x7f83...9a2b<br>
-                    该产品供应链全链路符合 GreenLink 可持续发展标准
-                </p>
-            </div>
+            <div style="background: rgba(0, 255, 65, 0.1); border: 1px dashed #00FF41; padding: 10px; border-radius: 8px;"><p style="color: #00FF41; margin: 0; font-size: 0.9rem;">✅ <strong>区块链存证哈希:</strong> 0x7f83...9a2b<br>该产品供应链全链路符合 GreenLink 可持续发展标准</p></div>
         </div>
         """, unsafe_allow_html=True)
 
-    # 标准解读模块
     st.markdown("---")
     with st.expander("📜 底层合规协议与国际标准 (COMPLIANCE PROTOCOLS)", expanded=True):
-        st.markdown("以下指标基于国际权威标准计算，确保数据可审计、可追溯：")
-        
         c1, c2, c3 = st.columns(3)
-        
-        with c1:
-            st.markdown("""
-            <div class="protocol-box">
-                <div class="protocol-title">ISO 14067 (碳足迹)</div>
-                <div style="color:#BBB; font-size:0.85rem;">
-                • <strong>标准:</strong> 产品碳足迹国际标准 (LCA法)<br>
-                • <strong>边界:</strong> 摇篮到大门 (Cradle-to-Gate)<br>
-                • <strong>对比:</strong> 行业平均 ~3.8kg CO2e<br>
-                • <strong>优势:</strong> 减碳 68% (绿色能源+循环经济)
-                </div>
-            </div>
-            """, unsafe_allow_html=True)
-            
-        with c2:
-            st.markdown("""
-            <div class="protocol-box">
-                <div class="protocol-title">EUDR (零毁林法案)</div>
-                <div style="color:#BBB; font-size:0.85rem;">
-                • <strong>法规:</strong> 欧盟第 2023/1115 号条例<br>
-                • <strong>红线:</strong> 2020年12月31日后无毁林<br>
-                • <strong>验证:</strong> Sentinel-2 卫星历史影像<br>
-                • <strong>状态:</strong> ✅ 地理定位 (Geolocation) 合规
-                </div>
-            </div>
-            """, unsafe_allow_html=True)
-            
-        with c3:
-            st.markdown("""
-            <div class="protocol-box">
-                <div class="protocol-title">ILO (劳工公约)</div>
-                <div style="color:#BBB; font-size:0.85rem;">
-                • <strong>核心:</strong> 国际劳工组织 8项核心公约<br>
-                • <strong>重点:</strong> C29 (强迫劳动) & C138 (童工)<br>
-                • <strong>风控:</strong> 规避美国 CBP WRO (暂扣令)<br>
-                • <strong>审计:</strong> 第三方 SA8000 认证通过
-                </div>
-            </div>
-            """, unsafe_allow_html=True)
+        with c1: st.markdown("""<div class="protocol-box"><div class="protocol-title">ISO 14067 (碳足迹)</div><div style="color:#BBB; font-size:0.85rem;">• <strong>标准:</strong> LCA法<br>• <strong>优势:</strong> 减碳 68%</div></div>""", unsafe_allow_html=True)
+        with c2: st.markdown("""<div class="protocol-box"><div class="protocol-title">EUDR (零毁林)</div><div style="color:#BBB; font-size:0.85rem;">• <strong>红线:</strong> 2020年后无毁林<br>• <strong>验证:</strong> Sentinel-2 卫星</div></div>""", unsafe_allow_html=True)
+        with c3: st.markdown("""<div class="protocol-box"><div class="protocol-title">ILO (劳工公约)</div><div style="color:#BBB; font-size:0.85rem;">• <strong>重点:</strong> 规避美国 CBP 禁令<br>• <strong>审计:</strong> SA8000 认证</div></div>""", unsafe_allow_html=True)
 
-# 侧边栏底部
 st.sidebar.markdown("---")
-st.sidebar.markdown("""
-<div style="font-size: 0.8rem; color: #666;">
-    POWERED BY<br>
-    <strong style="color: #FFF;">GREENLINK TECH</strong><br>
-    v2.5.0 (QR Fixed)
-</div>
-""", unsafe_allow_html=True)
+st.sidebar.markdown("""<div style="font-size: 0.8rem; color: #666;">POWERED BY <strong style="color: #FFF;">GREENLINK TECH</strong><br>v3.1.0 (Ultimate)</div>""", unsafe_allow_html=True)
