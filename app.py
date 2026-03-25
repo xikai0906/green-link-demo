@@ -362,7 +362,7 @@ with tab2:
     if is_cofco:
         st.info("💡 核心企业视角: 监控上游风险如何传导至自身及市场")
         st.markdown("""
-        <div style="display: flex; justify-content: space-around; align-items: stretch; background: #0F0F0F; padding: 20px; border-radius: 10px; border: 1px dashed #333; margin-bottom: 20px;">
+        <div style="display: flex; justify-content: space-around; align-items: stretch; background: #ffffff; padding: 20px; border-radius: 10px; border: 1px dashed #333; margin-bottom: 20px;">
             <div style="flex:1;" class="chain-box"><div style="border: 2px solid #FF3333; color: #FF3333; padding: 10px; border-radius: 5px;">FGV Holdings<br><small>上游/高风险</small></div></div>
             <div class="arrow">➜</div>
             <div style="flex:1;" class="chain-box"><div style="border: 2px solid #FFCC00; color: #FFCC00; padding: 10px; border-radius: 5px;">中粮集团<br><small>核心企业</small></div></div>
@@ -387,7 +387,7 @@ with tab2:
         st.info(f"💡 供应商视角: 您的 ESG 风险如何导致下游客户流失")
         my_risk_color = "#FF3333" if total_score > 50 else "#00FF41"
         st.markdown(f"""
-        <div style="display: flex; justify-content: space-around; align-items: stretch; background: #0F0F0F; padding: 20px; border-radius: 10px; border: 1px dashed #333; margin-bottom: 20px;">
+        <div style="display: flex; justify-content: space-around; align-items: stretch; background: #ffffff; padding: 20px; border-radius: 10px; border: 1px dashed #333; margin-bottom: 20px;">
             <div style="flex:1;" class="chain-box"><div style="border: 2px solid {my_risk_color}; color: {my_risk_color}; padding: 10px; border-radius: 5px;">{data.get('company')}<br><small>您 (供应商)</small></div></div>
             <div class="arrow">➜</div>
             <div style="flex:1;" class="chain-box"><div style="border: 2px solid #FFCC00; color: #FFCC00; padding: 10px; border-radius: 5px;">核心加工商<br><small>采购方</small></div></div>
