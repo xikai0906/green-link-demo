@@ -24,26 +24,26 @@ st.set_page_config(
 # 高清晰度科技风 CSS
 st.markdown("""
 <style>
-    /* 1. 全局背景与字体 */
+    /* 1. 全局背景与字体 - 白色主调 + 绿色点缀 */
     .stApp {
-        background-color: #050505;
-        color: #FFFFFF !important;
+        background-color: #f8fff8 !important;   /* 浅绿色调白底 */
+        color: #1a3c1a !important;              /* 深绿色文字 */
     }
-    .stMarkdown, .stText, p, div {
-        color: #E0E0E0;
+    .stMarkdown, .stText, p, div, label {
+        color: #1a3c1a !important;
         font-size: 1.05rem;
         line-height: 1.6;
     }
 
-    /* 2. 标题样式 */
+    /* 2. 标题 - 更醒目的绿色科技风 */
     .main-header {
         font-family: 'Courier New', monospace;
         font-size: 3.5rem;
         font-weight: 900;
-        color: #00FF41;
+        color: #00b140 !important;              /* 更鲜艳的绿色 */
         text-align: center;
         margin-bottom: 0.5rem;
-        text-shadow: 0 0 15px rgba(0, 255, 65, 0.6); 
+        text-shadow: 0 0 20px rgba(0, 177, 64, 0.4);
         letter-spacing: -2px;
         text-transform: uppercase;
     }
@@ -51,155 +51,142 @@ st.markdown("""
         font-family: sans-serif;
         font-size: 1.2rem;
         font-weight: bold;
-        color: #00F2FF;
+        color: #00c8a0 !important;              /* 青绿色 */
         text-align: center;
         margin-bottom: 3rem;
         letter-spacing: 2px;
-        border-bottom: 1px solid #333;
+        border-bottom: 2px solid #e0f0e0;
         padding-bottom: 20px;
     }
 
-    /* 3. 卡片样式 */
+    /* 3. 卡片样式 - 白色卡片 + 绿色左边框 */
     .tech-card {
-        background-color: #121212;
-        border: 1px solid #333;
-        border-left: 5px solid #00FF41;
+        background-color: #ffffff !important;
+        border: 1px solid #d0e8d0 !important;
+        border-left: 6px solid #00b140 !important;
         padding: 1.5rem;
-        border-radius: 6px;
+        border-radius: 12px;
         margin-bottom: 1.5rem;
-        box-shadow: 0 4px 20px rgba(0,0,0,0.5);
+        box-shadow: 0 6px 20px rgba(0, 177, 64, 0.12);
     }
-    .tech-card h3 { color: #00F2FF !important; margin-top: 0; font-weight: 800; }
-    
-    /* 4. 侧边栏 (Sidebar) */
-    section[data-testid="stSidebar"] {
-        background-color: #000000 !important;
-        border-right: 1px solid #333;
-    }
-    section[data-testid="stSidebar"] * {
-        color: #FFFFFF !important;
-    }
-    div[data-baseweb="select"] > div {
-        background-color: #1A1A1A !important;
-        color: #FFFFFF !important;
-        border: 1px solid #444 !important;
-    }
-    div[data-baseweb="popover"], div[data-baseweb="menu"], ul[role="listbox"] {
-        background-color: #000000 !important;
-        border-color: #333 !important;
-    }
-    li[role="option"] {
-        background-color: #000000 !important;
-        color: #FFFFFF !important;
-    }
-    li[role="option"]:hover, li[role="option"][aria-selected="true"] {
-        background-color: #00FF41 !important;
-        color: #000000 !important;
+    .tech-card h3 { 
+        color: #00b140 !important; 
+        margin-top: 0; 
+        font-weight: 800; 
     }
 
-    /* 5. 评分标准图例 */
+    /* 4. 侧边栏 - 浅绿色 */
+    section[data-testid="stSidebar"] {
+        background-color: #f0f9f0 !important;
+        border-right: 1px solid #c0e0c0;
+    }
+    section[data-testid="stSidebar"] * {
+        color: #1a3c1a !important;
+    }
+    div[data-baseweb="select"] > div {
+        background-color: #ffffff !important;
+        color: #1a3c1a !important;
+        border: 1px solid #a0d0a0 !important;
+    }
+    div[data-baseweb="popover"], div[data-baseweb="menu"], ul[role="listbox"] {
+        background-color: #ffffff !important;
+        border-color: #c0e0c0 !important;
+    }
+    li[role="option"]:hover, li[role="option"][aria-selected="true"] {
+        background-color: #00b140 !important;
+        color: #ffffff !important;
+    }
+
+    /* 5. 评分图例 - 适配浅色 */
     .score-legend-compact {
-        background: #080808;
-        border: 1px solid #333;
+        background: #f8fff8;
+        border: 1px solid #c0e0c0;
         padding: 8px;
         border-radius: 4px;
         font-size: 0.8rem;
-        height: 100%; 
+        height: 100%;
     }
     .legend-row {
         display: flex;
         align-items: center;
         margin-bottom: 3px;
-        color: #CCC;
-    }
-    .color-dot {
-        width: 8px;
-        height: 8px;
-        border-radius: 50%;
-        margin-right: 6px;
-        display: inline-block;
+        color: #1a3c1a;
     }
 
-    /* 6. 其他 UI 修复 */
-    div[data-testid="stMetricLabel"] { color: #AAAAAA !important; font-size: 0.85rem !important; }
-    div[data-testid="stMetricValue"] { color: #00FF41 !important; font-family: 'Courier New', monospace; font-size: 1.8rem !important; }
-    
-    .source-link-btn {
-        display: inline-block; margin-top: 8px; padding: 4px 10px;
-        border: 1px solid #333; border-radius: 4px;
-        color: #00F2FF !important; text-decoration: none;
-        background: rgba(0, 242, 255, 0.05); font-size: 0.8rem;
+    /* 6. Metric 指标 */
+    div[data-testid="stMetricLabel"] { 
+        color: #006633 !important; 
+        font-size: 0.85rem !important; 
     }
-    
+    div[data-testid="stMetricValue"] { 
+        color: #00b140 !important; 
+        font-family: 'Courier New', monospace; 
+        font-size: 1.8rem !important; 
+    }
+
+    /* 7. 产品溯源卡片 & 协议框 - 适配浅色 */
     .product-trace-card {
-        background: linear-gradient(145deg, #1a1a1a, #0d0d0d);
-        border: 1px solid #00F2FF; border-radius: 15px; padding: 20px; text-align: center;
+        background: linear-gradient(145deg, #ffffff, #f0fff0);
+        border: 2px solid #00b140;
+        border-radius: 15px;
+        padding: 20px;
+        text-align: center;
+        box-shadow: 0 4px 15px rgba(0, 177, 64, 0.15);
     }
-    
     .protocol-box {
-        background: #111; border: 1px solid #333; padding: 10px; border-radius: 5px; font-size: 0.9rem;
+        background: #f8fff8;
+        border: 1px solid #a0d0a0;
+        padding: 10px;
+        border-radius: 5px;
+        font-size: 0.9rem;
     }
-    .protocol-title { color: #00FF41; font-weight: bold; border-bottom: 1px solid #333; padding-bottom: 5px; margin-bottom: 5px; }
-    
-    .chain-box { text-align: center; padding: 15px; border-radius: 8px; font-weight: bold; margin: 5px; }
-    .arrow { color: #666; font-size: 1.5rem; display: flex; align-items: center; justify-content: center; }
-
-    [data-testid="stImage"] button svg, [data-testid="stVegaLiteChart"] button svg {
-        fill: #00FF41 !important; stroke: #00FF41 !important;
+    .protocol-title { 
+        color: #00b140; 
+        font-weight: bold; 
+        border-bottom: 1px solid #c0e0c0; 
+        padding-bottom: 5px; 
+        margin-bottom: 5px; 
     }
 
-    /* ========================================================================
-       13. Expander (折叠面板) 终极双重锁定修复
-       ======================================================================== */
-    
-    /* 针对 <details> 渲染模式 */
-    details[data-testid="stExpander"] {
-        background-color: #0A0A0A !important;
-        border: 1px solid #333 !important;
-        border-radius: 6px !important;
-        color: #FFFFFF !important;
+    /* 8. 供应链箭头框 */
+    .chain-box {
+        text-align: center;
+        padding: 15px;
+        border-radius: 8px;
+        font-weight: bold;
+        margin: 5px;
+        background: #ffffff;
+        border: 2px solid #00b140;
+    }
+
+    /* 9. Expander 折叠面板 */
+    details[data-testid="stExpander"], div[data-testid="stExpander"] {
+        background-color: #f8fff8 !important;
+        border: 1px solid #c0e0c0 !important;
+        border-radius: 8px !important;
     }
     details[data-testid="stExpander"] summary {
-        color: #00FF41 !important;
-        background-color: #111 !important;
-        border-bottom: 1px solid #333 !important;
+        color: #00b140 !important;
+        background-color: #f0f9f0 !important;
     }
-    /* 针对 <div> 渲染模式 (旧版兼容) */
-    div[data-testid="stExpander"] {
-        background-color: #0A0A0A !important;
-        border: 1px solid #333 !important;
-        color: #FFFFFF !important;
-    }
-    
-    /* 强制内容区域所有文字颜色 - 通杀所有子元素 */
-    details[data-testid="stExpander"] > div,
-    div[data-testid="stExpander"] > div[role="group"] {
-        background-color: #000000 !important;
-    }
-    
-    details[data-testid="stExpander"] *,
-    div[data-testid="stExpander"] * {
-        color: #E0E0E0 !important;
-    }
-    
-    /* 特别针对协议卡片内部 */
-    .protocol-box div, .protocol-box span {
-        color: #E0E0E0 !important;
-    }
-    
-    /* 14. 按钮样式 */
+
+    /* 10. 按钮 - 绿色科技风 */
     button[kind="primary"] {
-        background-color: #00FF41 !important;
-        color: #000 !important;
-        border: none !important;
+        background-color: #00b140 !important;
+        color: #ffffff !important;
         font-weight: bold !important;
         font-family: 'Courier New', monospace !important;
     }
     button[kind="primary"]:hover {
-        background-color: #00F2FF !important;
-        box-shadow: 0 0 15px rgba(0, 242, 255, 0.5) !important;
+        background-color: #00c8a0 !important;
+        box-shadow: 0 0 15px rgba(0, 200, 160, 0.5) !important;
     }
 
+    /* 额外小优化：让所有链接和危险提示也更协调 */
+    .source-link-btn {
+        color: #00b140 !important;
+        border: 1px solid #00b140;
+    }
 </style>
 """, unsafe_allow_html=True)
 
