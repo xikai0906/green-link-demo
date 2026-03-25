@@ -252,25 +252,24 @@ with tab1:
         st.markdown("##### ⚔️ 评级体系对比 (VS Traditional)")
         trad_data = data.get('traditional_rating') or data.get('social', {}).get('traditional_rating')
         rating_val = trad_data.get('rating', trad_data.get('msci', 'N/A')) if isinstance(trad_data, dict) else (trad_data if isinstance(trad_data, str) else 'N/A')
-            
+        
 c1, c2 = st.columns(2)
-        with c1:
-            st.markdown(f"""
-            <div style="background:#ffffff; padding:15px; border:1px solid #d0e8d0; border-left:6px solid #666; border-radius:8px; box-shadow:0 4px 12px rgba(0,177,64,0.1);">
-                <div style="color:#006633; font-size:0.85rem;">🏢 传统评级 (MSCI)</div>
-                <div style="font-size: 2.2rem; font-weight:bold; color: #1a3c1a;">{rating_val}</div>
-                <div style="color:#d32f2f; font-size:0.85rem;">❌ 评级模糊</div>
-            </div>
-            """, unsafe_allow_html=True)
-           
-        with c2:
-            st.markdown(f"""
-            <div style="background:#ffffff; padding:15px; border:1px solid #d0e8d0; border-left:6px solid #00b140; border-radius:8px; box-shadow:0 4px 12px rgba(0,177,64,0.1);">
-                <div style="color:#006633; font-size:0.85rem;">🌿 绿链 GreenLink</div>
-                <div style="font-size: 1.1rem; font-weight:bold; color: #00b140;">E/S 分离评分</div>
-                <div style="color:#1a3c1a; font-size:0.85rem;">Env: {env_score} | Soc: {soc_score}</div>
-            </div>
-            """, unsafe_allow_html=True)
+    with c1:
+    st.markdown(f"""
+    <div style="background:#ffffff; padding:15px; border:1px solid #d0e8d0; border-left:6px solid #666; border-radius:8px; box-shadow:0 4px 12px rgba(0,177,64,0.1);">
+    <div style="color:#006633; font-size:0.85rem;">🏢 传统评级 (MSCI)</div>
+    <div style="font-size: 2.2rem; font-weight:bold; color: #1a3c1a;">{rating_val}</div>
+    <div style="color:#d32f2f; font-size:0.85rem;">❌ 评级模糊</div>
+    </div>
+    """, unsafe_allow_html=True)
+    with c2:
+        st.markdown(f"""
+        <div style="background:#ffffff; padding:15px; border:1px solid #d0e8d0; border-left:6px solid #00b140; border-radius:8px; box-shadow:0 4px 12px rgba(0,177,64,0.1);">
+        <div style="color:#006633; font-size:0.85rem;">🌿 绿链 GreenLink</div>
+        <div style="font-size: 1.1rem; font-weight:bold; color: #00b140;">E/S 分离评分</div>
+        <div style="color:#1a3c1a; font-size:0.85rem;">Env: {env_score} | Soc: {soc_score}</div>
+        </div>
+        """, unsafe_allow_html=True)
 
     with col_chart:
         st.markdown("##### 核心指标 (Core Metrics)")
