@@ -253,7 +253,7 @@ with tab1:
         trad_data = data.get('traditional_rating') or data.get('social', {}).get('traditional_rating')
         rating_val = trad_data.get('rating', trad_data.get('msci', 'N/A')) if isinstance(trad_data, dict) else (trad_data if isinstance(trad_data, str) else 'N/A')
             
-               c1, c2 = st.columns(2)
+c1, c2 = st.columns(2)
         with c1:
             st.markdown(f"""
             <div style="background:#ffffff; padding:15px; border:1px solid #d0e8d0; border-left:6px solid #666; border-radius:8px; box-shadow:0 4px 12px rgba(0,177,64,0.1);">
